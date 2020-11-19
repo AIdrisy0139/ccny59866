@@ -15,17 +15,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <stdbool.h>
 
-
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include "queue.h"
 
 #define NSTUDENT 100
 #define NCONF 6
-#define BUFFER_SIZE 256 // Amount of characters in the buffer 
 double const studentpct[] = { 80, 90, 95, 98, 99, 99.5 };
 double student [NSTUDENT + 1][NCONF] = {
 /* inf */	{	1.282,	1.645,	1.960,	2.326,	2.576,	3.090  },
@@ -453,198 +447,49 @@ dbl_cmp(const void *a, const void *b)
 static struct dataset *
 ReadSet(const char *n, int column, const char *delim)
 {
-	int fileDescriptor;
-
-	char *p, *t;
-	char buffer[BUFFER_SIZE];
-	char overFlowBuffer[BUFFER_SIZE];
-	char overFlowString[BUFFER_SIZE];
-	buffer[BUFFER_SIZE-1] = '\0';
-	overFlowBuffer[BUFFER_SIZE-1] = '\0';
-	overFlowString[BUFFER_SIZE-1] = '\0';
+	FILE *f;
+	char buf[BUFSIZ], *p, *t;
 	struct dataset *s;
 	double d;
 	int line;
 	int i;
 
 	if (n == NULL) {
-		// No I/O file specified so set up opening FD
-		fileDescriptor = STDIN_FILENO;
-		n = STDIN_FILENO;
+		f = stdin;
+		n = "<stdin>";
 	} else if (!strcmp(n, "-")) {
-		fileDescriptor = STDIN_FILENO;
-		n = STDIN_FILENO ;
+		f = stdin;
+		n = "<stdin>";
 	} else {
-		// Open the file specified
-		// n = argv[1];
-		fileDescriptor = open(n, O_RDONLY);
+		f = fopen(n, "r");
 	}
-	if (fileDescriptor == -1) // Open reutrns -1 on failure
+	if (f == NULL)
 		err(1, "Cannot open %s", n);
-
 	s = NewSet();
 	s->name = strdup(n);
 	line = 0;
-	
-	int whileCount = 0;
-	int intCount = 0;
-	int overFlowIndex = 0;
-	int bytesRead = 1;
-	bool overFlowFlag = false;
-
-	while (bytesRead != 0 )
-	{
-		bytesRead = read(fileDescriptor, &buffer, BUFFER_SIZE-1);
-		printf("\n bytesRead = %d \n",bytesRead);
-		printf("buffer = %s",buffer);
-		printf("|SENTINAL\n");
-		printf("Length of buffer = %ld",strlen(buffer));
-		//buffer[bytesRead-1] = '\0'; //Make the buffer a string
-		//overFlowBuffer[bytesRead-1] = '\0';
-
-		whileCount++;
+	while (fgets(buf, sizeof buf, f) != NULL) {
 		line++;
 
-		int startIndex = 0;
-		char * subString;
-		//Loop through all the bytes read
-		for (size_t j = 0; j < bytesRead ; j++)
-		{
+		i = strlen(buf);
+		if (buf[i-1] == '\n')
+			buf[i-1] = '\0';
+		for (i = 1, t = strtok(buf, delim);
+		     t != NULL && *t != '#';
+		     i++, t = strtok(NULL, delim)) {
+			if (i == column)
+				break;
+		}
+		if (t == NULL || *t == '#')
+			continue;
 
-			subString = buffer + startIndex;//&buffer[startIndex]
-
-			if( buffer[j] == '\n')
-			{
-				buffer[j] = '\0'; //Make this int a null terminated substring
-
-				startIndex = j+1;
-				//If the first character read is a newline, now a null terminator, move the start of subString up
-				if(j == 0 && buffer[j] =='\0')
-				{
-					//subString = buffer + startIndex;
-				}
-				if(overFlowFlag  == true)
-				{
-					printf("----\n");
-					overFlowFlag = false;
-					intCount++;	
-
-					printf("In Overflow string building\n");
-					printf("overFlowIndex : %d \n",overFlowIndex);
-					printf("overFlowBuffer = [ %s ]  \n",overFlowBuffer);
-					printf("buffer = %s \n",buffer);
-					printf("j = %ld \n",j);
-					printf("startIndex : %d \n",startIndex);
-					printf("subString: %s \n", subString);
-					
-					if(overFlowBuffer[BUFFER_SIZE-1]=='\0')
-					{
-						printf("overFlowBuffer[LAST] == NULLTERM \n");
-					}
-					printf("overFlowBuffer + overFlowIndex = %s\n",overFlowBuffer + overFlowIndex);
-					strcpy(overFlowString, overFlowBuffer + overFlowIndex);
-					//strncpy(overFlowString, overFlowBuffer + overFlowIndex, BUFFER_SIZE-1 - overFlowIndex);
-					printf("strcpy: overFlowString: %s \n", overFlowString);
-
-					strcat(overFlowString,subString);
-
-					printf("overFlowString: %s \n", overFlowString);
-
-					overFlowIndex = 0;
-					for (i = 1, t = strtok(overFlowString, delim);
-					t != NULL && *t != '#';
-					i++, t = strtok(NULL, delim)) {
-					if (i == column)
-						break;
-					}
-					if (t == NULL || *t == '#')
-						continue;
-
-					d = strtod(t, &p);
-					if (p != NULL && *p != '\0')
-						err(2, "Invalid data on line %d in %s\n", line, n);
-					if (*overFlowString != '\0')
-						AddPoint(s, d);
-					
-					//overFlowIndex = 0;
-					//Why did overFlowFlag == false here lead to issue
-					//Where is the branch to prevent it from getting here?
-					
-
-					
-				}
-				else
-				{
-					printf("----\n");
-					printf("startIndex : %d \n",startIndex);
-					printf("subString: %s \n", subString);
-					intCount++;
-					for (i = 1, t = strtok(subString, delim);
-						t != NULL && *t != '#';
-						i++, t = strtok(NULL, delim)) {
-						if (i == column)
-							break;
-					}
-					if (t == NULL || *t == '#')
-						continue;
-
-					d = strtod(t, &p);
-					if (p != NULL && *p != '\0')
-						err(2, "Invalid data on line %d in %s\n", line, n);
-					if (*subString != '\0')
-						AddPoint(s, d);
-				}
-
-			}// Close If
-			//Puting this outside the for loop leads to ioctl error
-			if(j == bytesRead-1)
-			{
-				printf("<< J at END \n");
-				//Overflow detection
-				if( buffer[bytesRead-1] != '\0') 
-				{
-					overFlowIndex = startIndex;
-					strncpy(overFlowBuffer, buffer, BUFFER_SIZE);
-					overFlowFlag = true;
-					printf(">>overflow buffer needed \n");
-					printf(">>overFlowIndex %d\n",overFlowIndex);
-					printf(">>overFlowChar = %c\n",buffer[bytesRead-1]);
-				}
-				else
-				{
-					/*
-					//Append the last subString
-					//Puting this outside the for loop leads to ioctl error
-					for (i = 1, t = strtok(subString, delim);
-						t != NULL && *t != '#';
-						i++, t = strtok(NULL, delim)) {
-						if (i == column)
-							break;
-					}
-					if (t == NULL || *t == '#')
-						continue;
-
-					d = strtod(t, &p);
-					if (p != NULL && *p != '\0')
-						err(2, "Invalid data on line %d in %s\n", line, n);
-					if (*subString != '\0')
-						AddPoint(s, d);
-					*/
-				}	
-			}
-		}// Close For Lopp
-
-	}//Close While Loop
-
-	printf("Exited Loop\n");
-	printf("While Count = %d\n",whileCount);
-	printf("Integer Count = %d\n",intCount);
-
-	int ret = close(fileDescriptor);
-	if( ret == -1)
-	{
-		fprintf(stderr, "close failed with\n");
+		d = strtod(t, &p);
+		if (p != NULL && *p != '\0')
+			err(2, "Invalid data on line %d in %s\n", line, n);
+		if (*buf != '\0')
+			AddPoint(s, d);
 	}
+	fclose(f);
 	if (s->n < 3) {
 		fprintf(stderr,
 		    "Dataset %s must contain at least 3 data points\n", n);
