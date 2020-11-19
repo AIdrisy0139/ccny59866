@@ -1,3 +1,11 @@
+# CCNY 59866
+
+Professor : Samy Al Bahra 
+
+
+---
+
+
 # ministat
 A small tool to do the statistics legwork on benchmarks etc.
 
