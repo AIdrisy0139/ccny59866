@@ -542,6 +542,7 @@ ReadSet(const char *n, int column, const char *delim)
 						printf("overFlowBuffer[LAST] == NULLTERM \n");
 					}
 					printf("overFlowBuffer + overFlowIndex = %s\n",overFlowBuffer + overFlowIndex);
+
 					strcpy(overFlowString, overFlowBuffer + overFlowIndex);
 					//strncpy(overFlowString, overFlowBuffer + overFlowIndex, BUFFER_SIZE-1 - overFlowIndex);
 					printf("strcpy: overFlowString: %s \n", overFlowString);
