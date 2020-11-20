@@ -1,1185 +1,275 @@
-
- bytesRead = 255 
-buffer = 2551049411
-2117712982
-3409777232
-1101425664
-602819417
-1895220889
-1979210359
-703794293
-1205070627
-641643708
-2525650333
-4291659083
-1669929962
-2908244816
-571914399
-552272410
-1964234305
-1308004839
-565578585
-4292806530
-2012484957
-3189173879
-377546203
-642410609|SENTINAL
-Length of buffer = 255----
-startIndex : 11 
-subString: 2551049411 
-----
-startIndex : 22 
-subString: 2117712982 
-----
-startIndex : 33 
-subString: 3409777232 
-----
-startIndex : 44 
-subString: 1101425664 
-----
-startIndex : 54 
-subString: 602819417 
-----
-startIndex : 65 
-subString: 1895220889 
-----
-startIndex : 76 
-subString: 1979210359 
-----
-startIndex : 86 
-subString: 703794293 
-----
-startIndex : 97 
-subString: 1205070627 
-----
-startIndex : 107 
-subString: 641643708 
-----
-startIndex : 118 
-subString: 2525650333 
-----
-startIndex : 129 
-subString: 4291659083 
-----
-startIndex : 140 
-subString: 1669929962 
-----
-startIndex : 151 
-subString: 2908244816 
-----
-startIndex : 161 
-subString: 571914399 
-----
-startIndex : 171 
-subString: 552272410 
-----
-startIndex : 182 
-subString: 1964234305 
-----
-startIndex : 193 
-subString: 1308004839 
-----
-startIndex : 203 
-subString: 565578585 
-----
-startIndex : 214 
-subString: 4292806530 
-----
-startIndex : 225 
-subString: 2012484957 
-----
-startIndex : 236 
-subString: 3189173879 
-----
-startIndex : 246 
-subString: 377546203 
-<< J at END 
->>overflow buffer needed 
->>overFlowIndex 246
->>overFlowChar = 9
-
- bytesRead = 255 
-buffer = 
-137459180
-1409138633
-2804433551
-3391398708
-1412127362
-155240756
-1461951484
-637714959
-2085946429
-3976301442
-2415462993
-3302287835
-2536625221
-2912844428
-3261862907
-1821083585
-1130539049
-519354055
-1965944066
-264378048
-2199012143
-173294820
-361511713
-11361920|SENTINAL
-Length of buffer = 255----
-In Overflow string building
-overFlowIndex : 246 
-overFlowBuffer = [ 2551049411 ]  
-buffer =  
-j = 0 
-startIndex : 1 
-subString:  
-overFlowBuffer[LAST] == NULLTERM 
-overFlowBuffer + overFlowIndex = 
-strcpy: overFlowString:  
-overFlowString:  
-----
-startIndex : 11 
-subString: 137459180 
-----
-startIndex : 22 
-subString: 1409138633 
-----
-startIndex : 33 
-subString: 2804433551 
-----
-startIndex : 44 
-subString: 3391398708 
-----
-startIndex : 55 
-subString: 1412127362 
-----
-startIndex : 65 
-subString: 155240756 
-----
-startIndex : 76 
-subString: 1461951484 
-----
-startIndex : 86 
-subString: 637714959 
-----
-startIndex : 97 
-subString: 2085946429 
-----
-startIndex : 108 
-subString: 3976301442 
-----
-startIndex : 119 
-subString: 2415462993 
-----
-startIndex : 130 
-subString: 3302287835 
-----
-startIndex : 141 
-subString: 2536625221 
-----
-startIndex : 152 
-subString: 2912844428 
-----
-startIndex : 163 
-subString: 3261862907 
-----
-startIndex : 174 
-subString: 1821083585 
-----
-startIndex : 185 
-subString: 1130539049 
-----
-startIndex : 195 
-subString: 519354055 
-----
-startIndex : 206 
-subString: 1965944066 
-----
-startIndex : 216 
-subString: 264378048 
-----
-startIndex : 227 
-subString: 2199012143 
-----
-startIndex : 237 
-subString: 173294820 
-----
-startIndex : 247 
-subString: 361511713 
-<< J at END 
->>overflow buffer needed 
->>overFlowIndex 247
->>overFlowChar = 0
-
- bytesRead = 255 
-buffer = 78
-1969883677
-4065328303
-3642380042
-2327572324
-2104579193
-1154952965
-2309794664
-1297032000
-1921512644
-344472037
-1465649933
-2858609504
-3221180382
-124786308
-1242423955
-2633161348
-3358692483
-2405775414
-3546891659
-405400677
-934374083
-752157718
-2427564876
-5209|SENTINAL
-Length of buffer = 255----
-In Overflow string building
-overFlowIndex : 247 
-overFlowBuffer = [  ]  
-buffer = 78 
-j = 2 
-startIndex : 3 
-subString: 78 
-overFlowBuffer[LAST] == NULLTERM 
-overFlowBuffer + overFlowIndex = 
-strcpy: overFlowString:  
-overFlowString: 78 
-----
-startIndex : 14 
-subString: 1969883677 
-----
-startIndex : 25 
-subString: 4065328303 
-----
-startIndex : 36 
-subString: 3642380042 
-----
-startIndex : 47 
-subString: 2327572324 
-----
-startIndex : 58 
-subString: 2104579193 
-----
-startIndex : 69 
-subString: 1154952965 
-----
-startIndex : 80 
-subString: 2309794664 
-----
-startIndex : 91 
-subString: 1297032000 
-----
-startIndex : 102 
-subString: 1921512644 
-----
-startIndex : 112 
-subString: 344472037 
-----
-startIndex : 123 
-subString: 1465649933 
-----
-startIndex : 134 
-subString: 2858609504 
-----
-startIndex : 145 
-subString: 3221180382 
-----
-startIndex : 155 
-subString: 124786308 
-----
-startIndex : 166 
-subString: 1242423955 
-----
-startIndex : 177 
-subString: 2633161348 
-----
-startIndex : 188 
-subString: 3358692483 
-----
-startIndex : 199 
-subString: 2405775414 
-----
-startIndex : 210 
-subString: 3546891659 
-----
-startIndex : 220 
-subString: 405400677 
-----
-startIndex : 230 
-subString: 934374083 
-----
-startIndex : 240 
-subString: 752157718 
-----
-startIndex : 251 
-subString: 2427564876 
-<< J at END 
->>overflow buffer needed 
->>overFlowIndex 251
->>overFlowChar = 9
-
- bytesRead = 255 
-buffer = 43990
-2202800352
-1416716999
-1117079956
-2728248898
-2514095990
-915583404
-3354173780
-3398848908
-2323774499
-1072087892
-2667229024
-1688082465
-3748674474
-3388844392
-1654776853
-824622913
-3296866849
-201557287
-3988708365
-4237088421
-2212337801
-3612684598
-2600857734|SENTINAL
-Length of buffer = 255----
-In Overflow string building
-overFlowIndex : 251 
-overFlowBuffer = [ 78 ]  
-buffer = 43990 
-j = 5 
-startIndex : 6 
-subString: 43990 
-overFlowBuffer[LAST] == NULLTERM 
-overFlowBuffer + overFlowIndex = 
-strcpy: overFlowString:  
-overFlowString: 43990 
-----
-startIndex : 17 
-subString: 2202800352 
-----
-startIndex : 28 
-subString: 1416716999 
-----
-startIndex : 39 
-subString: 1117079956 
-----
-startIndex : 50 
-subString: 2728248898 
-----
-startIndex : 61 
-subString: 2514095990 
-----
-startIndex : 71 
-subString: 915583404 
-----
-startIndex : 82 
-subString: 3354173780 
-----
-startIndex : 93 
-subString: 3398848908 
-----
-startIndex : 104 
-subString: 2323774499 
-----
-startIndex : 115 
-subString: 1072087892 
-----
-startIndex : 126 
-subString: 2667229024 
-----
-startIndex : 137 
-subString: 1688082465 
-----
-startIndex : 148 
-subString: 3748674474 
-----
-startIndex : 159 
-subString: 3388844392 
-----
-startIndex : 170 
-subString: 1654776853 
-----
-startIndex : 180 
-subString: 824622913 
-----
-startIndex : 191 
-subString: 3296866849 
-----
-startIndex : 201 
-subString: 201557287 
-----
-startIndex : 212 
-subString: 3988708365 
-----
-startIndex : 223 
-subString: 4237088421 
-----
-startIndex : 234 
-subString: 2212337801 
-----
-startIndex : 245 
-subString: 3612684598 
-<< J at END 
->>overflow buffer needed 
->>overFlowIndex 245
->>overFlowChar = 4
-
- bytesRead = 255 
-buffer = 
-3414364388
-3033469664
-2825614764
-3238238625
-1247925859
-3317431637
-3694351866
-1921031233
-3295629475
-1512563337
-4135888328
-2995025924
-4221688263
-4166837171
-2755279320
-1269705417
-421257351
-1131764698
-1557938783
-1766321560
-190094121
-344647708
-1505814559
-2202|SENTINAL
-Length of buffer = 255----
-In Overflow string building
-overFlowIndex : 245 
-overFlowBuffer = [ 43990 ]  
-buffer =  
-j = 0 
-startIndex : 1 
-subString:  
-overFlowBuffer[LAST] == NULLTERM 
-overFlowBuffer + overFlowIndex = 
-strcpy: overFlowString:  
-overFlowString:  
-----
-startIndex : 12 
-subString: 3414364388 
-----
-startIndex : 23 
-subString: 3033469664 
-----
-startIndex : 34 
-subString: 2825614764 
-----
-startIndex : 45 
-subString: 3238238625 
-----
-startIndex : 56 
-subString: 1247925859 
-----
-startIndex : 67 
-subString: 3317431637 
-----
-startIndex : 78 
-subString: 3694351866 
-----
-startIndex : 89 
-subString: 1921031233 
-----
-startIndex : 100 
-subString: 3295629475 
-----
-startIndex : 111 
-subString: 1512563337 
-----
-startIndex : 122 
-subString: 4135888328 
-----
-startIndex : 133 
-subString: 2995025924 
-----
-startIndex : 144 
-subString: 4221688263 
-----
-startIndex : 155 
-subString: 4166837171 
-----
-startIndex : 166 
-subString: 2755279320 
-----
-startIndex : 177 
-subString: 1269705417 
-----
-startIndex : 187 
-subString: 421257351 
-----
-startIndex : 198 
-subString: 1131764698 
-----
-startIndex : 209 
-subString: 1557938783 
-----
-startIndex : 220 
-subString: 1766321560 
-----
-startIndex : 230 
-subString: 190094121 
-----
-startIndex : 240 
-subString: 344647708 
-----
-startIndex : 251 
-subString: 1505814559 
-<< J at END 
->>overflow buffer needed 
->>overFlowIndex 251
->>overFlowChar = 2
-
- bytesRead = 255 
-buffer = 692917
-2932813002
-2850627428
-3928724763
-325746858
-2565566462
-3701283649
-1872787470
-1523160087
-1451663923
-3164916132
-598422608
-4133559669
-2142456886
-287692198
-31267116
-498281689
-1772732232
-2331151059
-2210485649
-3441752751
-691099082
-1194170894
-3419181670
-35|SENTINAL
-Length of buffer = 255----
-In Overflow string building
-overFlowIndex : 251 
-overFlowBuffer = [  ]  
-buffer = 692917 
-j = 6 
-startIndex : 7 
-subString: 692917 
-overFlowBuffer[LAST] == NULLTERM 
-overFlowBuffer + overFlowIndex = 
-strcpy: overFlowString:  
-overFlowString: 692917 
-----
-startIndex : 18 
-subString: 2932813002 
-----
-startIndex : 29 
-subString: 2850627428 
-----
-startIndex : 40 
-subString: 3928724763 
-----
-startIndex : 50 
-subString: 325746858 
-----
-startIndex : 61 
-subString: 2565566462 
-----
-startIndex : 72 
-subString: 3701283649 
-----
-startIndex : 83 
-subString: 1872787470 
-----
-startIndex : 94 
-subString: 1523160087 
-----
-startIndex : 105 
-subString: 1451663923 
-----
-startIndex : 116 
-subString: 3164916132 
-----
-startIndex : 126 
-subString: 598422608 
-----
-startIndex : 137 
-subString: 4133559669 
-----
-startIndex : 148 
-subString: 2142456886 
-----
-startIndex : 158 
-subString: 287692198 
-----
-startIndex : 167 
-subString: 31267116 
-----
-startIndex : 177 
-subString: 498281689 
-----
-startIndex : 188 
-subString: 1772732232 
-----
-startIndex : 199 
-subString: 2331151059 
-----
-startIndex : 210 
-subString: 2210485649 
-----
-startIndex : 221 
-subString: 3441752751 
-----
-startIndex : 231 
-subString: 691099082 
-----
-startIndex : 242 
-subString: 1194170894 
-----
-startIndex : 253 
-subString: 3419181670 
-<< J at END 
->>overflow buffer needed 
->>overFlowIndex 253
->>overFlowChar = 5
-
- bytesRead = 255 
-buffer = 43932209
-2652105876
-2450051982
-2373625659
-180189611
-1907272282
-3794290549
-2455375070
-2767996727
-4126347265
-3415720681
-7601310
-2733184876
-3099203720
-1134233655
-3792716099
-825464881
-2057343777
-1416541787
-2512146703
-3743506943
-53562389
-1491051963
-1102927781
-|SENTINAL
-Length of buffer = 255----
-In Overflow string building
-overFlowIndex : 253 
-overFlowBuffer = [ 692917 ]  
-buffer = 43932209 
-j = 8 
-startIndex : 9 
-subString: 43932209 
-overFlowBuffer[LAST] == NULLTERM 
-overFlowBuffer + overFlowIndex = 
-strcpy: overFlowString:  
-overFlowString: 43932209 
-----
-startIndex : 20 
-subString: 2652105876 
-----
-startIndex : 31 
-subString: 2450051982 
-----
-startIndex : 42 
-subString: 2373625659 
-----
-startIndex : 52 
-subString: 180189611 
-----
-startIndex : 63 
-subString: 1907272282 
-----
-startIndex : 74 
-subString: 3794290549 
-----
-startIndex : 85 
-subString: 2455375070 
-----
-startIndex : 96 
-subString: 2767996727 
-----
-startIndex : 107 
-subString: 4126347265 
-----
-startIndex : 118 
-subString: 3415720681 
-----
-startIndex : 126 
-subString: 7601310 
-----
-startIndex : 137 
-subString: 2733184876 
-----
-startIndex : 148 
-subString: 3099203720 
-----
-startIndex : 159 
-subString: 1134233655 
-----
-startIndex : 170 
-subString: 3792716099 
-----
-startIndex : 180 
-subString: 825464881 
-----
-startIndex : 191 
-subString: 2057343777 
-----
-startIndex : 202 
-subString: 1416541787 
-----
-startIndex : 213 
-subString: 2512146703 
-----
-startIndex : 224 
-subString: 3743506943 
-----
-startIndex : 233 
-subString: 53562389 
-----
-startIndex : 244 
-subString: 1491051963 
-----
-startIndex : 255 
-subString: 1102927781 
-<< J at END 
-
- bytesRead = 255 
-buffer = 1237695862
-3834291093
-3999874172
-2274796521
-408584872
-196671394
-422434044
-1291923451
-448159309
-2355684734
-1256494212
-1470227009
-96515056
-1342607685
-402785065
-4067059999
-2380130970
-2018141697
-2079859352
-1414222812
-1298061010
-383746565
-3739812746
-2815953894|SENTINAL
-Length of buffer = 255----
-startIndex : 11 
-subString: 1237695862 
-----
-startIndex : 22 
-subString: 3834291093 
-----
-startIndex : 33 
-subString: 3999874172 
-----
-startIndex : 44 
-subString: 2274796521 
-----
-startIndex : 54 
-subString: 408584872 
-----
-startIndex : 64 
-subString: 196671394 
-----
-startIndex : 74 
-subString: 422434044 
-----
-startIndex : 85 
-subString: 1291923451 
-----
-startIndex : 95 
-subString: 448159309 
-----
-startIndex : 106 
-subString: 2355684734 
-----
-startIndex : 117 
-subString: 1256494212 
-----
-startIndex : 128 
-subString: 1470227009 
-----
-startIndex : 137 
-subString: 96515056 
-----
-startIndex : 148 
-subString: 1342607685 
-----
-startIndex : 158 
-subString: 402785065 
-----
-startIndex : 169 
-subString: 4067059999 
-----
-startIndex : 180 
-subString: 2380130970 
-----
-startIndex : 191 
-subString: 2018141697 
-----
-startIndex : 202 
-subString: 2079859352 
-----
-startIndex : 213 
-subString: 1414222812 
-----
-startIndex : 224 
-subString: 1298061010 
-----
-startIndex : 234 
-subString: 383746565 
-----
-startIndex : 245 
-subString: 3739812746 
-<< J at END 
->>overflow buffer needed 
->>overFlowIndex 245
->>overFlowChar = 4
-
- bytesRead = 255 
-buffer = 
-2648344990
-3081207975
-972724885
-1105887778
-774708512
-3038458359
-3160670940
-182939242
-1034185258
-3741061277
-647966224
-1286007407
-3735705529
-513796018
-830876255
-1873095398
-810608628
-359632763
-1129089
-1795212469
-3482222348
-905727105
-3391348202
-3292920209
-24|SENTINAL
-Length of buffer = 255----
-In Overflow string building
-overFlowIndex : 245 
-overFlowBuffer = [ 1237695862 ]  
-buffer =  
-j = 0 
-startIndex : 1 
-subString:  
-overFlowBuffer[LAST] == NULLTERM 
-overFlowBuffer + overFlowIndex = 
-strcpy: overFlowString:  
-overFlowString:  
-----
-startIndex : 12 
-subString: 2648344990 
-----
-startIndex : 23 
-subString: 3081207975 
-----
-startIndex : 33 
-subString: 972724885 
-----
-startIndex : 44 
-subString: 1105887778 
-----
-startIndex : 54 
-subString: 774708512 
-----
-startIndex : 65 
-subString: 3038458359 
-----
-startIndex : 76 
-subString: 3160670940 
-----
-startIndex : 86 
-subString: 182939242 
-----
-startIndex : 97 
-subString: 1034185258 
-----
-startIndex : 108 
-subString: 3741061277 
-----
-startIndex : 118 
-subString: 647966224 
-----
-startIndex : 129 
-subString: 1286007407 
-----
-startIndex : 140 
-subString: 3735705529 
-----
-startIndex : 150 
-subString: 513796018 
-----
-startIndex : 160 
-subString: 830876255 
-----
-startIndex : 171 
-subString: 1873095398 
-----
-startIndex : 181 
-subString: 810608628 
-----
-startIndex : 191 
-subString: 359632763 
-----
-startIndex : 199 
-subString: 1129089 
-----
-startIndex : 210 
-subString: 1795212469 
-----
-startIndex : 221 
-subString: 3482222348 
-----
-startIndex : 231 
-subString: 905727105 
-----
-startIndex : 242 
-subString: 3391348202 
-----
-startIndex : 253 
-subString: 3292920209 
-<< J at END 
->>overflow buffer needed 
->>overFlowIndex 253
->>overFlowChar = 4
-
- bytesRead = 255 
-buffer = 23635075
-475156066
-2292875798
-2568430948
-3426758598
-235336397
-3563778131
-2257876863
-2599921503
-3145904124
-3750710800
-215659385
-720893801
-2984194776
-3475093930
-1003929230
-1655822717
-2261450058
-1578591655
-496913491
-323583011
-238309359
-2600912051
-2518326558
-|SENTINAL
-Length of buffer = 255----
-In Overflow string building
-overFlowIndex : 253 
-overFlowBuffer = [  ]  
-buffer = 23635075 
-j = 8 
-startIndex : 9 
-subString: 23635075 
-overFlowBuffer[LAST] == NULLTERM 
-overFlowBuffer + overFlowIndex = 
-strcpy: overFlowString:  
-overFlowString: 23635075 
-----
-startIndex : 19 
-subString: 475156066 
-----
-startIndex : 30 
-subString: 2292875798 
-----
-startIndex : 41 
-subString: 2568430948 
-----
-startIndex : 52 
-subString: 3426758598 
-----
-startIndex : 62 
-subString: 235336397 
-----
-startIndex : 73 
-subString: 3563778131 
-----
-startIndex : 84 
-subString: 2257876863 
-----
-startIndex : 95 
-subString: 2599921503 
-----
-startIndex : 106 
-subString: 3145904124 
-----
-startIndex : 117 
-subString: 3750710800 
-----
-startIndex : 127 
-subString: 215659385 
-----
-startIndex : 137 
-subString: 720893801 
-----
-startIndex : 148 
-subString: 2984194776 
-----
-startIndex : 159 
-subString: 3475093930 
-----
-startIndex : 170 
-subString: 1003929230 
-----
-startIndex : 181 
-subString: 1655822717 
-----
-startIndex : 192 
-subString: 2261450058 
-----
-startIndex : 203 
-subString: 1578591655 
-----
-startIndex : 213 
-subString: 496913491 
-----
-startIndex : 223 
-subString: 323583011 
-----
-startIndex : 233 
-subString: 238309359 
-----
-startIndex : 244 
-subString: 2600912051 
-----
-startIndex : 255 
-subString: 2518326558 
-<< J at END 
-
- bytesRead = 193 
-buffer = 837392976
-49717546
-1000920713
-1011586798
-4211246014
-1372118336
-3548288400
-1796951349
-1975788322
-2032180289
-2095458253
-1146769375
-1940708798
-2448335092
-206164701
-1644069316
-3042845287
-777405803
-578591655|SENTINAL
-Length of buffer = 202----
-startIndex : 10 
-subString: 837392976 
-----
-startIndex : 19 
-subString: 49717546 
-----
-startIndex : 30 
-subString: 1000920713 
-----
-startIndex : 41 
-subString: 1011586798 
-----
-startIndex : 52 
-subString: 4211246014 
-----
-startIndex : 63 
-subString: 1372118336 
-----
-startIndex : 74 
-subString: 3548288400 
-----
-startIndex : 85 
-subString: 1796951349 
-----
-startIndex : 96 
-subString: 1975788322 
-----
-startIndex : 107 
-subString: 2032180289 
-----
-startIndex : 118 
-subString: 2095458253 
-----
-startIndex : 129 
-subString: 1146769375 
-----
-startIndex : 140 
-subString: 1940708798 
-----
-startIndex : 151 
-subString: 2448335092 
-----
-startIndex : 161 
-subString: 206164701 
-----
-startIndex : 172 
-subString: 1644069316 
-----
-startIndex : 183 
-subString: 3042845287 
-----
-startIndex : 193 
-subString: 777405803 
-<< J at END 
-
- bytesRead = 0 
-buffer = 837392976|SENTINAL
-Length of buffer = 9Exited Loop
-While Count = 12
-Integer Count = 256
-x 256
-+--------------------------------------------------------------------------+
-|                                                          x               |
-|                                                          x               |
-|   x  x            x                                      x     x         |
-|x  x  xx           x  x          x      x  x              x     x         |
-|x  xx xx      x    x  x xx       x      x  x            x x     x         |
-|xx xx xxx x   x  x xxxx xxx x   xxxxx x x  xxx      x   x x     x         |
-|xxxxx xxxxxxxxx  x xxxx xxx x  xxxxxx xxxxxxxx  x   x xxx xx    x   x x x |
-|xxxxx xxxxxxxxx xxxxxxxxxxx x xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx xxx  xxx xx|
-|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx xxxxxxx|
-|            |____________________A____________________|                   |
-+--------------------------------------------------------------------------+
-    N           Min           Max        Median           Avg        Stddev
-x 253            78 4.2928065e+09 1.9215126e+09  1.935415e+09  1.231313e+09
+startIndex = 0  || subString = [2551049411] 
+ startIndex = 11  || subString = [2117712982] 
+ startIndex = 22  || subString = [3409777232] 
+ startIndex = 33  || subString = [1101425664] 
+ startIndex = 44  || subString = [602819417] 
+ startIndex = 54  || subString = [1895220889] 
+ startIndex = 65  || subString = [1979210359] 
+ startIndex = 76  || subString = [703794293] 
+ startIndex = 86  || subString = [1205070627] 
+ startIndex = 97  || subString = [641643708] 
+ startIndex = 107  || subString = [2525650333] 
+ startIndex = 118  || subString = [4291659083] 
+ startIndex = 129  || subString = [1669929962] 
+ startIndex = 140  || subString = [2908244816] 
+ startIndex = 151  || subString = [571914399] 
+ startIndex = 161  || subString = [552272410] 
+ startIndex = 171  || subString = [1964234305] 
+ startIndex = 182  || subString = [1308004839] 
+ startIndex = 193  || subString = [565578585] 
+ startIndex = 203  || subString = [4292806530] 
+ startIndex = 214  || subString = [2012484957] 
+ startIndex = 225  || subString = [3189173879] 
+ startIndex = 236  || subString = [377546203] 
+ >> In Null Check <<
+OUTSIDE:: startIndex = 246  || subString = [642410609] 
+ >> In Null Check <<
+startIndex = 1  || subString = [137459180] 
+ startIndex = 11  || subString = [1409138633] 
+ startIndex = 22  || subString = [2804433551] 
+ startIndex = 33  || subString = [3391398708] 
+ startIndex = 44  || subString = [1412127362] 
+ startIndex = 55  || subString = [155240756] 
+ startIndex = 65  || subString = [1461951484] 
+ startIndex = 76  || subString = [637714959] 
+ startIndex = 86  || subString = [2085946429] 
+ startIndex = 97  || subString = [3976301442] 
+ startIndex = 108  || subString = [2415462993] 
+ startIndex = 119  || subString = [3302287835] 
+ startIndex = 130  || subString = [2536625221] 
+ startIndex = 141  || subString = [2912844428] 
+ startIndex = 152  || subString = [3261862907] 
+ startIndex = 163  || subString = [1821083585] 
+ startIndex = 174  || subString = [1130539049] 
+ startIndex = 185  || subString = [519354055] 
+ startIndex = 195  || subString = [1965944066] 
+ startIndex = 206  || subString = [264378048] 
+ startIndex = 216  || subString = [2199012143] 
+ startIndex = 227  || subString = [173294820] 
+ startIndex = 237  || subString = [361511713] 
+ >> In Null Check <<
+OUTSIDE:: startIndex = 247  || subString = [11361920] 
+ startIndex = 0  || subString = [78] 
+ startIndex = 3  || subString = [1969883677] 
+ startIndex = 14  || subString = [4065328303] 
+ startIndex = 25  || subString = [3642380042] 
+ startIndex = 36  || subString = [2327572324] 
+ startIndex = 47  || subString = [2104579193] 
+ startIndex = 58  || subString = [1154952965] 
+ startIndex = 69  || subString = [2309794664] 
+ startIndex = 80  || subString = [1297032000] 
+ startIndex = 91  || subString = [1921512644] 
+ startIndex = 102  || subString = [344472037] 
+ startIndex = 112  || subString = [1465649933] 
+ startIndex = 123  || subString = [2858609504] 
+ startIndex = 134  || subString = [3221180382] 
+ startIndex = 145  || subString = [124786308] 
+ startIndex = 155  || subString = [1242423955] 
+ startIndex = 166  || subString = [2633161348] 
+ startIndex = 177  || subString = [3358692483] 
+ startIndex = 188  || subString = [2405775414] 
+ startIndex = 199  || subString = [3546891659] 
+ startIndex = 210  || subString = [405400677] 
+ startIndex = 220  || subString = [934374083] 
+ startIndex = 230  || subString = [752157718] 
+ startIndex = 240  || subString = [2427564876] 
+ >> In Null Check <<
+OUTSIDE:: startIndex = 251  || subString = [5209] 
+ startIndex = 0  || subString = [43990] 
+ startIndex = 6  || subString = [2202800352] 
+ startIndex = 17  || subString = [1416716999] 
+ startIndex = 28  || subString = [1117079956] 
+ startIndex = 39  || subString = [2728248898] 
+ startIndex = 50  || subString = [2514095990] 
+ startIndex = 61  || subString = [915583404] 
+ startIndex = 71  || subString = [3354173780] 
+ startIndex = 82  || subString = [3398848908] 
+ startIndex = 93  || subString = [2323774499] 
+ startIndex = 104  || subString = [1072087892] 
+ startIndex = 115  || subString = [2667229024] 
+ startIndex = 126  || subString = [1688082465] 
+ startIndex = 137  || subString = [3748674474] 
+ startIndex = 148  || subString = [3388844392] 
+ startIndex = 159  || subString = [1654776853] 
+ startIndex = 170  || subString = [824622913] 
+ startIndex = 180  || subString = [3296866849] 
+ startIndex = 191  || subString = [201557287] 
+ startIndex = 201  || subString = [3988708365] 
+ startIndex = 212  || subString = [4237088421] 
+ startIndex = 223  || subString = [2212337801] 
+ startIndex = 234  || subString = [3612684598] 
+ >> In Null Check <<
+OUTSIDE:: startIndex = 245  || subString = [2600857734] 
+ >> In Null Check <<
+startIndex = 1  || subString = [3414364388] 
+ startIndex = 12  || subString = [3033469664] 
+ startIndex = 23  || subString = [2825614764] 
+ startIndex = 34  || subString = [3238238625] 
+ startIndex = 45  || subString = [1247925859] 
+ startIndex = 56  || subString = [3317431637] 
+ startIndex = 67  || subString = [3694351866] 
+ startIndex = 78  || subString = [1921031233] 
+ startIndex = 89  || subString = [3295629475] 
+ startIndex = 100  || subString = [1512563337] 
+ startIndex = 111  || subString = [4135888328] 
+ startIndex = 122  || subString = [2995025924] 
+ startIndex = 133  || subString = [4221688263] 
+ startIndex = 144  || subString = [4166837171] 
+ startIndex = 155  || subString = [2755279320] 
+ startIndex = 166  || subString = [1269705417] 
+ startIndex = 177  || subString = [421257351] 
+ startIndex = 187  || subString = [1131764698] 
+ startIndex = 198  || subString = [1557938783] 
+ startIndex = 209  || subString = [1766321560] 
+ startIndex = 220  || subString = [190094121] 
+ startIndex = 230  || subString = [344647708] 
+ startIndex = 240  || subString = [1505814559] 
+ >> In Null Check <<
+OUTSIDE:: startIndex = 251  || subString = [2202] 
+ startIndex = 0  || subString = [692917] 
+ startIndex = 7  || subString = [2932813002] 
+ startIndex = 18  || subString = [2850627428] 
+ startIndex = 29  || subString = [3928724763] 
+ startIndex = 40  || subString = [325746858] 
+ startIndex = 50  || subString = [2565566462] 
+ startIndex = 61  || subString = [3701283649] 
+ startIndex = 72  || subString = [1872787470] 
+ startIndex = 83  || subString = [1523160087] 
+ startIndex = 94  || subString = [1451663923] 
+ startIndex = 105  || subString = [3164916132] 
+ startIndex = 116  || subString = [598422608] 
+ startIndex = 126  || subString = [4133559669] 
+ startIndex = 137  || subString = [2142456886] 
+ startIndex = 148  || subString = [287692198] 
+ startIndex = 158  || subString = [31267116] 
+ startIndex = 167  || subString = [498281689] 
+ startIndex = 177  || subString = [1772732232] 
+ startIndex = 188  || subString = [2331151059] 
+ startIndex = 199  || subString = [2210485649] 
+ startIndex = 210  || subString = [3441752751] 
+ startIndex = 221  || subString = [691099082] 
+ startIndex = 231  || subString = [1194170894] 
+ startIndex = 242  || subString = [3419181670] 
+ >> In Null Check <<
+OUTSIDE:: startIndex = 253  || subString = [35] 
+ startIndex = 0  || subString = [43932209] 
+ startIndex = 9  || subString = [2652105876] 
+ startIndex = 20  || subString = [2450051982] 
+ startIndex = 31  || subString = [2373625659] 
+ startIndex = 42  || subString = [180189611] 
+ startIndex = 52  || subString = [1907272282] 
+ startIndex = 63  || subString = [3794290549] 
+ startIndex = 74  || subString = [2455375070] 
+ startIndex = 85  || subString = [2767996727] 
+ startIndex = 96  || subString = [4126347265] 
+ startIndex = 107  || subString = [3415720681] 
+ startIndex = 118  || subString = [7601310] 
+ startIndex = 126  || subString = [2733184876] 
+ startIndex = 137  || subString = [3099203720] 
+ startIndex = 148  || subString = [1134233655] 
+ startIndex = 159  || subString = [3792716099] 
+ startIndex = 170  || subString = [825464881] 
+ startIndex = 180  || subString = [2057343777] 
+ startIndex = 191  || subString = [1416541787] 
+ startIndex = 202  || subString = [2512146703] 
+ startIndex = 213  || subString = [3743506943] 
+ startIndex = 224  || subString = [53562389] 
+ startIndex = 233  || subString = [1491051963] 
+ startIndex = 244  || subString = [1102927781] 
+ startIndex = 0  || subString = [1237695862] 
+ startIndex = 11  || subString = [3834291093] 
+ startIndex = 22  || subString = [3999874172] 
+ startIndex = 33  || subString = [2274796521] 
+ startIndex = 44  || subString = [408584872] 
+ startIndex = 54  || subString = [196671394] 
+ startIndex = 64  || subString = [422434044] 
+ startIndex = 74  || subString = [1291923451] 
+ startIndex = 85  || subString = [448159309] 
+ startIndex = 95  || subString = [2355684734] 
+ startIndex = 106  || subString = [1256494212] 
+ startIndex = 117  || subString = [1470227009] 
+ startIndex = 128  || subString = [96515056] 
+ startIndex = 137  || subString = [1342607685] 
+ startIndex = 148  || subString = [402785065] 
+ startIndex = 158  || subString = [4067059999] 
+ startIndex = 169  || subString = [2380130970] 
+ startIndex = 180  || subString = [2018141697] 
+ startIndex = 191  || subString = [2079859352] 
+ startIndex = 202  || subString = [1414222812] 
+ startIndex = 213  || subString = [1298061010] 
+ startIndex = 224  || subString = [383746565] 
+ startIndex = 234  || subString = [3739812746] 
+ >> In Null Check <<
+OUTSIDE:: startIndex = 245  || subString = [2815953894] 
+ >> In Null Check <<
+startIndex = 1  || subString = [2648344990] 
+ startIndex = 12  || subString = [3081207975] 
+ startIndex = 23  || subString = [972724885] 
+ startIndex = 33  || subString = [1105887778] 
+ startIndex = 44  || subString = [774708512] 
+ startIndex = 54  || subString = [3038458359] 
+ startIndex = 65  || subString = [3160670940] 
+ startIndex = 76  || subString = [182939242] 
+ startIndex = 86  || subString = [1034185258] 
+ startIndex = 97  || subString = [3741061277] 
+ startIndex = 108  || subString = [647966224] 
+ startIndex = 118  || subString = [1286007407] 
+ startIndex = 129  || subString = [3735705529] 
+ startIndex = 140  || subString = [513796018] 
+ startIndex = 150  || subString = [830876255] 
+ startIndex = 160  || subString = [1873095398] 
+ startIndex = 171  || subString = [810608628] 
+ startIndex = 181  || subString = [359632763] 
+ startIndex = 191  || subString = [1129089] 
+ startIndex = 199  || subString = [1795212469] 
+ startIndex = 210  || subString = [3482222348] 
+ startIndex = 221  || subString = [905727105] 
+ startIndex = 231  || subString = [3391348202] 
+ startIndex = 242  || subString = [3292920209] 
+ >> In Null Check <<
+OUTSIDE:: startIndex = 253  || subString = [24] 
+ startIndex = 0  || subString = [23635075] 
+ startIndex = 9  || subString = [475156066] 
+ startIndex = 19  || subString = [2292875798] 
+ startIndex = 30  || subString = [2568430948] 
+ startIndex = 41  || subString = [3426758598] 
+ startIndex = 52  || subString = [235336397] 
+ startIndex = 62  || subString = [3563778131] 
+ startIndex = 73  || subString = [2257876863] 
+ startIndex = 84  || subString = [2599921503] 
+ startIndex = 95  || subString = [3145904124] 
+ startIndex = 106  || subString = [3750710800] 
+ startIndex = 117  || subString = [215659385] 
+ startIndex = 127  || subString = [720893801] 
+ startIndex = 137  || subString = [2984194776] 
+ startIndex = 148  || subString = [3475093930] 
+ startIndex = 159  || subString = [1003929230] 
+ startIndex = 170  || subString = [1655822717] 
+ startIndex = 181  || subString = [2261450058] 
+ startIndex = 192  || subString = [1578591655] 
+ startIndex = 203  || subString = [496913491] 
+ startIndex = 213  || subString = [323583011] 
+ startIndex = 223  || subString = [238309359] 
+ startIndex = 233  || subString = [2600912051] 
+ startIndex = 244  || subString = [2518326558] 
+ startIndex = 0  || subString = [837392976] 
+ startIndex = 10  || subString = [49717546] 
+ startIndex = 19  || subString = [1000920713] 
+ startIndex = 30  || subString = [1011586798] 
+ startIndex = 41  || subString = [4211246014] 
+ startIndex = 52  || subString = [1372118336] 
+ startIndex = 63  || subString = [3548288400] 
+ startIndex = 74  || subString = [1796951349] 
+ startIndex = 85  || subString = [1975788322] 
+ startIndex = 96  || subString = [2032180289] 
+ startIndex = 107  || subString = [2095458253] 
+ startIndex = 118  || subString = [1146769375] 
+ startIndex = 129  || subString = [1940708798] 
+ startIndex = 140  || subString = [2448335092] 
+ startIndex = 151  || subString = [206164701] 
+ startIndex = 161  || subString = [1644069316] 
+ startIndex = 172  || subString = [3042845287] 
+ startIndex = 183  || subString = [777405803] 
+ >> In Null Check <<
+OUTSIDE:: startIndex = 193  || subString = [578591655] 
+ intCount = [262] 

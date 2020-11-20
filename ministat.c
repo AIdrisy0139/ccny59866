@@ -457,15 +457,10 @@ ReadSet(const char *n, int column, const char *delim)
 
 	char *p, *t;
 	char buffer[BUFFER_SIZE];
-	char overFlowBuffer[BUFFER_SIZE];
-	char overFlowString[BUFFER_SIZE];
 	buffer[BUFFER_SIZE-1] = '\0';
-	overFlowBuffer[BUFFER_SIZE-1] = '\0';
-	overFlowString[BUFFER_SIZE-1] = '\0';
 	struct dataset *s;
 	double d;
 	int line;
-	int i;
 
 	if (n == NULL) {
 		// No I/O file specified so set up opening FD
@@ -485,162 +480,73 @@ ReadSet(const char *n, int column, const char *delim)
 	s = NewSet();
 	s->name = strdup(n);
 	line = 0;
-	
-	int whileCount = 0;
-	int intCount = 0;
-	int overFlowIndex = 0;
-	int bytesRead = 1;
-	bool overFlowFlag = false;
 
+	#if 0
+		Read BUFFER_SIZE many bytes from the file
+		Keep track of starting location = start
+		Iterate through the buffer and file the new lines \m
+			Replace the \n  with a \0 to make it a string
+			Pass the substring from buffer[start:[\0]] to the processing code
+		If at end of BUFFER and buffer[bytesRead-1] is not a \n then overflow exists
+			Copy Contents into an overflow buffer
+			Keep track of subString start in the overflow buffer
+	#endif
+	int bytesRead = 1;
+	int intCount = 0;
 	while (bytesRead != 0 )
 	{
 		bytesRead = read(fileDescriptor, &buffer, BUFFER_SIZE-1);
-		printf("\n bytesRead = %d \n",bytesRead);
-		printf("buffer = %s",buffer);
-		printf("|SENTINAL\n");
-		printf("Length of buffer = %ld",strlen(buffer));
-		//buffer[bytesRead-1] = '\0'; //Make the buffer a string
-		//overFlowBuffer[bytesRead-1] = '\0';
+		//EOF
+		if(bytesRead == 0)
+			break;
 
-		whileCount++;
 		line++;
-
 		int startIndex = 0;
-		char * subString;
-		//Loop through all the bytes read
-		for (size_t j = 0; j < bytesRead ; j++)
+		#if 0
+		NOTE: when to terminate?
+			buffer[BUFFER_SIZE = buffer[256] => ERROR BAD
+			buffer[BUFFER_SIZE-1] = buffer[255] => Reserved Null Terminator BAD
+			buffer[bytesRead] = buffer[255] (in general) =>^
+			buffer[bytesRead-1] = buffer[254] => last valid char from file GOOD
+		#endif
+		for (size_t i = 0; i < bytesRead ; i++)
 		{
-
-			subString = buffer + startIndex;//&buffer[startIndex]
-
-			if( buffer[j] == '\n')
+			if(buffer[i] == '\n')
 			{
-				buffer[j] = '\0'; //Make this int a null terminated substring
-
-				startIndex = j+1;
-				//If the first character read is a newline, now a null terminator, move the start of subString up
-				if(j == 0 && buffer[j] =='\0')
+				buffer[i] = '\0';
+				//For when first elemetn read is a \n
+				//if(memchr(buffer+startIndex,'\0',1) != NULL)
+				if(buffer[startIndex] == '\0')
 				{
-					//subString = buffer + startIndex;
+					printf(">> In Null Check <<\n");
+					startIndex = i + 1;
+					continue;
 				}
-				if(overFlowFlag  == true)
-				{
-					printf("----\n");
-					overFlowFlag = false;
-					intCount++;	
-
-					printf("In Overflow string building\n");
-					printf("overFlowIndex : %d \n",overFlowIndex);
-					printf("overFlowBuffer = [ %s ]  \n",overFlowBuffer);
-					printf("buffer = %s \n",buffer);
-					printf("j = %ld \n",j);
-					printf("startIndex : %d \n",startIndex);
-					printf("subString: %s \n", subString);
-					
-					if(overFlowBuffer[BUFFER_SIZE-1]=='\0')
-					{
-						printf("overFlowBuffer[LAST] == NULLTERM \n");
-					}
-					printf("overFlowBuffer + overFlowIndex = %s\n",overFlowBuffer + overFlowIndex);
-
-					strcpy(overFlowString, overFlowBuffer + overFlowIndex);
-					//strncpy(overFlowString, overFlowBuffer + overFlowIndex, BUFFER_SIZE-1 - overFlowIndex);
-					printf("strcpy: overFlowString: %s \n", overFlowString);
-
-					strcat(overFlowString,subString);
-
-					printf("overFlowString: %s \n", overFlowString);
-
-					overFlowIndex = 0;
-					for (i = 1, t = strtok(overFlowString, delim);
-					t != NULL && *t != '#';
-					i++, t = strtok(NULL, delim)) {
-					if (i == column)
-						break;
-					}
-					if (t == NULL || *t == '#')
-						continue;
-
-					d = strtod(t, &p);
-					if (p != NULL && *p != '\0')
-						err(2, "Invalid data on line %d in %s\n", line, n);
-					if (*overFlowString != '\0')
-						AddPoint(s, d);
-					
-					//overFlowIndex = 0;
-					//Why did overFlowFlag == false here lead to issue
-					//Where is the branch to prevent it from getting here?
-					
-
-					
-				}
-				else
-				{
-					printf("----\n");
-					printf("startIndex : %d \n",startIndex);
-					printf("subString: %s \n", subString);
-					intCount++;
-					for (i = 1, t = strtok(subString, delim);
-						t != NULL && *t != '#';
-						i++, t = strtok(NULL, delim)) {
-						if (i == column)
-							break;
-					}
-					if (t == NULL || *t == '#')
-						continue;
-
-					d = strtod(t, &p);
-					if (p != NULL && *p != '\0')
-						err(2, "Invalid data on line %d in %s\n", line, n);
-					if (*subString != '\0')
-						AddPoint(s, d);
-				}
-
-			}// Close If
-			//Puting this outside the for loop leads to ioctl error
-			if(j == bytesRead-1)
-			{
-				printf("<< J at END \n");
-				//Overflow detection
-				if( buffer[bytesRead-1] != '\0') 
-				{
-					overFlowIndex = startIndex;
-					strncpy(overFlowBuffer, buffer, BUFFER_SIZE);
-					overFlowFlag = true;
-					printf(">>overflow buffer needed \n");
-					printf(">>overFlowIndex %d\n",overFlowIndex);
-					printf(">>overFlowChar = %c\n",buffer[bytesRead-1]);
-				}
-				else
-				{
-					/*
-					//Append the last subString
-					//Puting this outside the for loop leads to ioctl error
-					for (i = 1, t = strtok(subString, delim);
-						t != NULL && *t != '#';
-						i++, t = strtok(NULL, delim)) {
-						if (i == column)
-							break;
-					}
-					if (t == NULL || *t == '#')
-						continue;
-
-					d = strtod(t, &p);
-					if (p != NULL && *p != '\0')
-						err(2, "Invalid data on line %d in %s\n", line, n);
-					if (*subString != '\0')
-						AddPoint(s, d);
-					*/
-				}	
+				//printf("bytesRead = %d || ", bytesRead);
+				printf("startIndex = %d  || ", startIndex);
+				printf("subString = [%s] \n ", buffer + startIndex);
+				intCount++;
+				startIndex = i + 1;
 			}
-		}// Close For Lopp
+		}
+
+		//Get last subString, if its not a null
+		if(buffer[startIndex] != '\0')
+		{
+			printf(">> In Null Check <<\n");
+			printf("OUTSIDE:: ");
+			printf("startIndex = %d  || ", startIndex);
+			printf("subString = [%s] \n ", buffer + startIndex);
+			intCount++;
+
+		}
+
+		
+
 
 	}//Close While Loop
 
-	printf("Exited Loop\n");
-	printf("While Count = %d\n",whileCount);
-	printf("Integer Count = %d\n",intCount);
-
+	printf("intCount = [%d] \n",intCount);
 	int ret = close(fileDescriptor);
 	if( ret == -1)
 	{
