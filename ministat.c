@@ -460,8 +460,8 @@ ReadSet(const char *n, int column, const char *delim)
 	buffer[BUFFER_SIZE-1] = '\0';
 	char overFlowBuffer[BUFFER_SIZE];
 	overFlowBuffer[BUFFER_SIZE-1] = '\0';
-	char overFlowString[BUFFER_SIZE];
-	overFlowString[BUFFER_SIZE-1] = '\0';
+	char finalString[BUFFER_SIZE];
+	finalString[BUFFER_SIZE-1] = '\0';
 	bool overFlowFlag = false;
 	struct dataset *s;
 	double d;
@@ -521,19 +521,18 @@ ReadSet(const char *n, int column, const char *delim)
 			{
 				buffer[i] = '\0';
 
-				//For when first elemetn read is a \n
 				////if(memchr(buffer+startIndex,'\0',1) != NULL)
+				//For when first elemetn read is a \n
+#if 0
 				if(buffer[startIndex] == '\0')
 				{
 					printf(">> In Null Check : Inside <<\n");
 					startIndex = i + 1;
 					overFlowFlag = false;
-					continue;
+					//continue;
 				}
+#endif
 
-
-				printf("startIndex = %d  || ", startIndex);
-				printf("subString = [%s] \n ", buffer + startIndex);
 				if(overFlowFlag == true)
 				{
 					printf("--OVFL Str Build:\n");
@@ -543,17 +542,28 @@ ReadSet(const char *n, int column, const char *delim)
 					printf("Current: startIndex = %d, subString = [%s]\n",
 						startIndex,buffer + startIndex);
 #endif
-					memset(overFlowString,'\0', BUFFER_SIZE);
-					strcat(overFlowString, overFlowBuffer + overFlowIndex);
-					strcat(overFlowString,buffer + startIndex);
-					printf("overFlowString = %s\n", overFlowString);
+					memset(finalString,'\0', BUFFER_SIZE);
+					strcat(finalString, overFlowBuffer + overFlowIndex);
+					strcat(finalString,buffer + startIndex);
+					printf("startIndex = %d  || ", startIndex);
+					printf("finalString = %s\n", finalString);
 					overFlowFlag = false;
+					intCount++;
 				}
-				intCount++;
+				else
+				{
+					memset(finalString,'\0', BUFFER_SIZE);
+					strcat(finalString,buffer + startIndex);
+					printf("startIndex = %d  || ", startIndex);
+					printf("finalString = %s\n", finalString);
+					intCount++;
+				}
+				
 				startIndex = i + 1;
 			}
 		} //Close For loop
 
+#if 0
 		//Get last subString, if its not a null
 		if(buffer[startIndex] != '\0')
 		{
@@ -562,7 +572,7 @@ ReadSet(const char *n, int column, const char *delim)
 			printf("subString = [%s] \n ", buffer + startIndex);
 			intCount++;
 		}
-		
+#endif
 		//Overflow Detection
 		if(buffer[bytesRead-1] != '\n')
 		{
@@ -571,53 +581,8 @@ ReadSet(const char *n, int column, const char *delim)
 			memcpy(overFlowBuffer,buffer,BUFFER_SIZE);
 			printf("::OVFL Detected \n");
 			printf("startIndex = %d \n",startIndex);
+			printf("subString = [%s] \n ", buffer + startIndex);
 		}
-		
-		
-
-			//TODO: Remove when debug complete
-			#if 0
-			printf("overFlowBuffer:: \n");
-			for (size_t j = 0; j < BUFFER_SIZE; j++)
-			{
-				if(overFlowBuffer[j] == "\0")
-					printf("\0");
-				else
-				{
-					printf("%c", overFlowBuffer[j]);
-				}
-			}
-			printf("::\n\n");
-
-
-			printf("buffer:: \n");
-			for (size_t j = 0; j < BUFFER_SIZE; j++)
-			{
-				if(buffer[j] == "\0")
-					printf("\0");
-				else
-				{
-					printf("%c", buffer[j]);
-				}
-			}
-			printf("::\n\n");
-			#endif		
-
-
-			#if 0
-			for (size_t i = 0; i < BUFFER_SIZE; i++)
-			{
-				if(overFlowBuffer[i] != buffer[i])
-				{
-					printf("At Index [%ld] : OFB = %c and BUF = %c \n",
-						i, overFlowBuffer[i],buffer[i]);
-				}
-			}
-			#endif
-			
-
-		
-
 
 	}//Close While Loop
 
