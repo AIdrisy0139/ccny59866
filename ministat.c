@@ -536,29 +536,17 @@ ReadSet(const char *n, int column, const char *delim)
 				printf("subString = [%s] \n ", buffer + startIndex);
 				if(overFlowFlag == true)
 				{
-					
-					//strcat(overFlowString, overFlowBuffer + overFlowIndex);
-					//strcat(overFlowString,buffer + startIndex);
-
 					printf("--OVFL Str Build:\n");
+#if 0
 					printf("Old: Index = %d || Substring = [%s] \n",
 						overFlowIndex,overFlowBuffer + overFlowIndex);
 					printf("Current: startIndex = %d, subString = [%s]\n",
 						startIndex,buffer + startIndex);
-					#if 0
-					printf("overFlowBuffer:: \n");
-					for (size_t j = 0; j < BUFFER_SIZE; j++)
-					{
-						if(overFlowBuffer[j] == "\0")
-							printf("\0");
-						else
-						{
-							printf("%c", overFlowBuffer[j]);
-						}
-						
-					}
-					printf("::\n");			
-					#endif
+#endif
+					memset(overFlowString,'\0', BUFFER_SIZE);
+					strcat(overFlowString, overFlowBuffer + overFlowIndex);
+					strcat(overFlowString,buffer + startIndex);
+					printf("overFlowString = %s\n", overFlowString);
 					overFlowFlag = false;
 				}
 				intCount++;
@@ -583,7 +571,11 @@ ReadSet(const char *n, int column, const char *delim)
 			memcpy(overFlowBuffer,buffer,BUFFER_SIZE);
 			printf("::OVFL Detected \n");
 			printf("startIndex = %d \n",startIndex);
+		}
+		
+		
 
+			//TODO: Remove when debug complete
 			#if 0
 			printf("overFlowBuffer:: \n");
 			for (size_t j = 0; j < BUFFER_SIZE; j++)
@@ -611,10 +603,8 @@ ReadSet(const char *n, int column, const char *delim)
 			printf("::\n\n");
 			#endif		
 
-		}// Close while loop
 
 			#if 0
-			//TODO: Remove when debug complete
 			for (size_t i = 0; i < BUFFER_SIZE; i++)
 			{
 				if(overFlowBuffer[i] != buffer[i])

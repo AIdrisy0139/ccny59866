@@ -57,6 +57,8 @@ startIndex = 0  || subString = [78]
  --OVFL Str Build:
 Old: Index = 247 || Substring = [11361920] 
 Current: startIndex = 0, subString = [78]
+Adding Old: overFlowString = 11361920
+Adding New: overFlowString = 1136192078
 startIndex = 3  || subString = [1969883677] 
  startIndex = 14  || subString = [4065328303] 
  startIndex = 25  || subString = [3642380042] 
@@ -88,6 +90,8 @@ startIndex = 0  || subString = [43990]
  --OVFL Str Build:
 Old: Index = 251 || Substring = [5209] 
 Current: startIndex = 0, subString = [43990]
+Adding Old: overFlowString = 5209
+Adding New: overFlowString = 520943990
 startIndex = 6  || subString = [2202800352] 
  startIndex = 17  || subString = [1416716999] 
  startIndex = 28  || subString = [1117079956] 
@@ -146,6 +150,8 @@ startIndex = 0  || subString = [692917]
  --OVFL Str Build:
 Old: Index = 251 || Substring = [2202] 
 Current: startIndex = 0, subString = [692917]
+Adding Old: overFlowString = 2202
+Adding New: overFlowString = 2202692917
 startIndex = 7  || subString = [2932813002] 
  startIndex = 18  || subString = [2850627428] 
  startIndex = 29  || subString = [3928724763] 
@@ -177,6 +183,8 @@ startIndex = 0  || subString = [43932209]
  --OVFL Str Build:
 Old: Index = 253 || Substring = [35] 
 Current: startIndex = 0, subString = [43932209]
+Adding Old: overFlowString = 35
+Adding New: overFlowString = 3543932209
 startIndex = 9  || subString = [2652105876] 
  startIndex = 20  || subString = [2450051982] 
  startIndex = 31  || subString = [2373625659] 
@@ -206,6 +214,8 @@ startIndex = 0  || subString = [1237695862]
  --OVFL Str Build:
 Old: Index = 255 || Substring = [] 
 Current: startIndex = 0, subString = [1237695862]
+Adding Old: overFlowString = 
+Adding New: overFlowString = 1237695862
 startIndex = 11  || subString = [3834291093] 
  startIndex = 22  || subString = [3999874172] 
  startIndex = 33  || subString = [2274796521] 
@@ -265,6 +275,8 @@ startIndex = 0  || subString = [23635075]
  --OVFL Str Build:
 Old: Index = 253 || Substring = [24] 
 Current: startIndex = 0, subString = [23635075]
+Adding Old: overFlowString = 24
+Adding New: overFlowString = 2423635075
 startIndex = 9  || subString = [475156066] 
  startIndex = 19  || subString = [2292875798] 
  startIndex = 30  || subString = [2568430948] 
@@ -294,6 +306,8 @@ startIndex = 0  || subString = [837392976]
  --OVFL Str Build:
 Old: Index = 255 || Substring = [] 
 Current: startIndex = 0, subString = [837392976]
+Adding Old: overFlowString = 
+Adding New: overFlowString = 837392976
 startIndex = 10  || subString = [49717546] 
  startIndex = 19  || subString = [1000920713] 
  startIndex = 30  || subString = [1011586798] 
