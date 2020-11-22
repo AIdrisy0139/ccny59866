@@ -458,6 +458,7 @@ ReadSet(const char *n, int column, const char *delim)
 	char *p, *t;
 	char buffer[BUFFER_SIZE];
 	buffer[BUFFER_SIZE-1] = '\0';
+	char * bufferPtr = &buffer[0];
 	char overFlowBuffer[BUFFER_SIZE];
 	overFlowBuffer[BUFFER_SIZE-1] = '\0';
 	char finalString[BUFFER_SIZE];
@@ -517,8 +518,10 @@ ReadSet(const char *n, int column, const char *delim)
 		#endif
 		for (size_t i = 0; i < bytesRead ; i++)
 		{
-			if(buffer[i] == '\n')
+			if(*bufferPtr == '\n')
+			//if(buffer[i] == '\n')
 			{
+				bufferPtr++;
 				buffer[i] = '\0';
 
 				if(overFlowFlag == true)
