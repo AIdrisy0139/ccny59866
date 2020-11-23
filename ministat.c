@@ -456,14 +456,18 @@ ReadSet(const char *n, int column, const char *delim)
 	int fileDescriptor;
 
 	char *p, *t;
+
 	char buffer[BUFFER_SIZE];
 	buffer[BUFFER_SIZE-1] = '\0';
-	char * bufferPtr = &buffer[0];
+	char * bufferPtr = buffer;
+
 	char overFlowBuffer[BUFFER_SIZE];
 	overFlowBuffer[BUFFER_SIZE-1] = '\0';
+	bool overFlowFlag = false;
+
 	char finalString[BUFFER_SIZE];
 	finalString[BUFFER_SIZE-1] = '\0';
-	bool overFlowFlag = false;
+
 	struct dataset *s;
 	double d;
 	int line;
@@ -507,7 +511,6 @@ ReadSet(const char *n, int column, const char *delim)
 		if(bytesRead == 0)
 			break;
 
-		line++;
 		int startIndex = 0;
 		#if 0
 		NOTE: when to terminate?
@@ -518,11 +521,15 @@ ReadSet(const char *n, int column, const char *delim)
 		#endif
 		for (size_t i = 0; i < bytesRead ; i++)
 		{
-			if(*bufferPtr == '\n')
-			//if(buffer[i] == '\n')
+
+			//printf("*bufferPTR = %c\n", *bufferPtr);
+			//if(memchr(bufferPtr,'\n',1) != NULL) //If not null means its bufferPTR == \n
+			//if(*bufferPtr == '\n')
+			if(buffer[i] == '\n')
 			{
-				bufferPtr++;
+				printf(" i = %ld \n", i);
 				buffer[i] = '\0';
+				line++;
 
 				if(overFlowFlag == true)
 				{
@@ -555,8 +562,10 @@ ReadSet(const char *n, int column, const char *delim)
 					err(2, "Invalid data on line %d in %s\n", line, n);
 				if (*finalString != '\0')
 					AddPoint(s, d);
-
 			}
+
+			//bufferPtr++; //+= sizeof(char);
+
 		} //Close For loop
 
 		//Overflow Detection
