@@ -511,16 +511,19 @@ ReadSet(const char *n, int column, const char *delim)
 		if(bytesRead == 0)
 			break;
 
-		int startIndex = 0;
+		int startIndex = 0; //Keep track of the start of new integers
+
+		// Loop through buffer parsing for integers
 		for (size_t i = 0; i < bytesRead ; i++)
 		{
-
+			// New line means an integer has ended
 			if(buffer[i] == '\n')
 			{
-				printf(" i = %ld \n", i);
+				// Replace \n with a \0 so the integer's subString is null terminated
 				buffer[i] = '\0';
 				line++;
 
+				//Overflow string building to concat across the current and previous buffers
 				if(overFlowFlag == true)
 				{
 					memset(finalString,'\0', BUFFER_SIZE);
@@ -531,13 +534,15 @@ ReadSet(const char *n, int column, const char *delim)
 				}
 				else
 				{
+					//No overflow
 					memset(finalString,'\0', BUFFER_SIZE);
 					strcat(finalString,buffer + startIndex);
 					intCount++;
 				}
 
 				startIndex = i + 1;
-				
+				//Append to data struct
+
 				for (i = 1, t = strtok(finalString, delim);
 					t != NULL && *t != '#';
 					i++, t = strtok(NULL, delim)) {
@@ -557,7 +562,7 @@ ReadSet(const char *n, int column, const char *delim)
 
 		} //Close For loop
 
-		//Overflow Detection
+		//Overflow Detection when the buffer splits an integer
 		if(buffer[bytesRead-1] != '\n')
 		{
 			overFlowFlag = true;
