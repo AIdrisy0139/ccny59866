@@ -1,3 +1,4 @@
+  
 /*
  * ----------------------------------------------------------------------------
  * "THE BEER-WARE LICENSE" (Revision 42):
@@ -512,9 +513,19 @@ ReadSet(const char *n, int column, const char *delim)
 			break;
 
 		int startIndex = 0;
+		#if 0
+		NOTE: when to terminate?
+			buffer[BUFFER_SIZE = buffer[256] => ERROR BAD
+			buffer[BUFFER_SIZE-1] = buffer[255] => Reserved Null Terminator BAD
+			buffer[bytesRead] = buffer[255] (in general) =>^
+			buffer[bytesRead-1] = buffer[254] => last valid char from file GOOD
+		#endif
 		for (size_t i = 0; i < bytesRead ; i++)
 		{
 
+			//printf("*bufferPTR = %c\n", *bufferPtr);
+			//if(memchr(bufferPtr,'\n',1) != NULL) //If not null means its bufferPTR == \n
+			//if(*bufferPtr == '\n')
 			if(buffer[i] == '\n')
 			{
 				printf(" i = %ld \n", i);
@@ -554,6 +565,7 @@ ReadSet(const char *n, int column, const char *delim)
 					AddPoint(s, d);
 			}
 
+			//bufferPtr++; //+= sizeof(char);
 
 		} //Close For loop
 
@@ -711,3 +723,4 @@ main(int argc, char **argv)
 	}
 	exit(0);
 }
+
