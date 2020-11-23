@@ -471,7 +471,7 @@ ReadSet(const char *n, int column, const char *delim)
 	struct dataset *s;
 	double d;
 	int line;
-
+	int z;
 	if (n == NULL) {
 		// No I/O file specified so set up opening FD
 		fileDescriptor = STDIN_FILENO;
@@ -519,16 +519,26 @@ ReadSet(const char *n, int column, const char *delim)
 			buffer[bytesRead] = buffer[255] (in general) =>^
 			buffer[bytesRead-1] = buffer[254] => last valid char from file GOOD
 		#endif
-		for (size_t i = 0; i < bytesRead ; i++)
+		//int fCount = 0;
+		int i = 0;
+		for(char *ptr = buffer; *ptr != '\0'; ++ptr)
+		//for (size_t i = 0; i < bytesRead ; i++)
 		{
 
+			#if 0
+			printf("fCount = %d, i = %ld \n",fCount, i);
+			if(fCount != i)
+				printf("<><><> fcount {%d} != i {%ld} \n",fCount, i);
+			#endif
+			printf("i = %d \n", i);
 			//printf("*bufferPTR = %c\n", *bufferPtr);
 			//if(memchr(bufferPtr,'\n',1) != NULL) //If not null means its bufferPTR == \n
-			//if(*bufferPtr == '\n')
-			if(buffer[i] == '\n')
+			if(*ptr == '\n')
+			//if(buffer[i] == '\n')
 			{
-				printf(" i = %ld \n", i);
-				buffer[i] = '\0';
+				//printf(" i = %ld \n", i);
+				//buffer[i] = '\0';
+				*ptr = '\0';
 				line++;
 
 				if(overFlowFlag == true)
@@ -548,10 +558,11 @@ ReadSet(const char *n, int column, const char *delim)
 
 				startIndex = i + 1;
 				
-				for (i = 1, t = strtok(finalString, delim);
+				z = strlen(finalString);
+				for (z = 1, t = strtok(finalString, delim);
 					t != NULL && *t != '#';
-					i++, t = strtok(NULL, delim)) {
-					if (i == column)
+					z++, t = strtok(NULL, delim)) {
+					if (z == column)
 						break;
 				}
 				if (t == NULL || *t == '#')
@@ -564,6 +575,8 @@ ReadSet(const char *n, int column, const char *delim)
 					AddPoint(s, d);
 			}
 
+			i++;	
+			//fCount++;
 			//bufferPtr++; //+= sizeof(char);
 
 		} //Close For loop
