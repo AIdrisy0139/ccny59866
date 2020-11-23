@@ -459,7 +459,6 @@ ReadSet(const char *n, int column, const char *delim)
 
 	char buffer[BUFFER_SIZE];
 	buffer[BUFFER_SIZE-1] = '\0';
-	char * bufferPtr = buffer;
 
 	char overFlowBuffer[BUFFER_SIZE];
 	overFlowBuffer[BUFFER_SIZE-1] = '\0';
