@@ -1,3 +1,4 @@
+  
 /*
  * ----------------------------------------------------------------------------
  * "THE BEER-WARE LICENSE" (Revision 42):
@@ -459,6 +460,7 @@ ReadSet(const char *n, int column, const char *delim)
 
 	char buffer[BUFFER_SIZE];
 	buffer[BUFFER_SIZE-1] = '\0';
+	char * bufferPtr = buffer;
 
 	char overFlowBuffer[BUFFER_SIZE];
 	overFlowBuffer[BUFFER_SIZE-1] = '\0';
@@ -470,7 +472,7 @@ ReadSet(const char *n, int column, const char *delim)
 	struct dataset *s;
 	double d;
 	int line;
-	int z;
+
 	if (n == NULL) {
 		// No I/O file specified so set up opening FD
 		fileDescriptor = STDIN_FILENO;
@@ -510,31 +512,26 @@ ReadSet(const char *n, int column, const char *delim)
 		if(bytesRead == 0)
 			break;
 
-<<<<<<< HEAD
 		int startIndex = 0;
-
-		int index = 0; //Tracks Index ptr is at. Makes some arithmetic easier
-		for(char *ptr = buffer; *ptr != '\0'; ++ptr)
-		//for (size_t i = 0; i < bytesRead ; i++)
-		{
-			if(*ptr == '\n')
-			{
-				*ptr = '\0';
-=======
-		int startIndex = 0; //Keep track of the start of new integers
-
-		// Loop through buffer parsing for integers
+		#if 0
+		NOTE: when to terminate?
+			buffer[BUFFER_SIZE = buffer[256] => ERROR BAD
+			buffer[BUFFER_SIZE-1] = buffer[255] => Reserved Null Terminator BAD
+			buffer[bytesRead] = buffer[255] (in general) =>^
+			buffer[bytesRead-1] = buffer[254] => last valid char from file GOOD
+		#endif
 		for (size_t i = 0; i < bytesRead ; i++)
 		{
-			// New line means an integer has ended
+
+			//printf("*bufferPTR = %c\n", *bufferPtr);
+			//if(memchr(bufferPtr,'\n',1) != NULL) //If not null means its bufferPTR == \n
+			//if(*bufferPtr == '\n')
 			if(buffer[i] == '\n')
 			{
-				// Replace \n with a \0 so the integer's subString is null terminated
+				printf(" i = %ld \n", i);
 				buffer[i] = '\0';
->>>>>>> master
 				line++;
 
-				//Overflow string building to concat across the current and previous buffers
 				if(overFlowFlag == true)
 				{
 					memset(finalString,'\0', BUFFER_SIZE);
@@ -545,27 +542,17 @@ ReadSet(const char *n, int column, const char *delim)
 				}
 				else
 				{
-					//No overflow
 					memset(finalString,'\0', BUFFER_SIZE);
 					strcat(finalString,buffer + startIndex);
 					intCount++;
 				}
 
-<<<<<<< HEAD
-				startIndex = index + 1;
-				
-				//Appending the parsed string to the data struct
-				z = strlen(finalString);
-				for (z = 1, t = strtok(finalString, delim);
-=======
 				startIndex = i + 1;
-				//Append to data struct
-
+				
 				for (i = 1, t = strtok(finalString, delim);
->>>>>>> master
 					t != NULL && *t != '#';
-					z++, t = strtok(NULL, delim)) {
-					if (z == column)
+					i++, t = strtok(NULL, delim)) {
+					if (i == column)
 						break;
 				}
 				if (t == NULL || *t == '#')
@@ -578,15 +565,11 @@ ReadSet(const char *n, int column, const char *delim)
 					AddPoint(s, d);
 			}
 
-<<<<<<< HEAD
-			index++;	
-
-=======
->>>>>>> master
+			//bufferPtr++; //+= sizeof(char);
 
 		} //Close For loop
 
-		//Overflow Detection when the buffer splits an integer
+		//Overflow Detection
 		if(buffer[bytesRead-1] != '\n')
 		{
 			overFlowFlag = true;
@@ -740,3 +723,4 @@ main(int argc, char **argv)
 	}
 	exit(0);
 }
+
