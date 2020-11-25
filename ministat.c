@@ -510,7 +510,6 @@ ReadSet(const char *n, int column, const char *delim)
 		if(bytesRead == 0)
 			break;
 
-<<<<<<< HEAD
 		int startIndex = 0;
 
 		int index = 0; //Tracks Index ptr is at. Makes some arithmetic easier
@@ -520,18 +519,6 @@ ReadSet(const char *n, int column, const char *delim)
 			if(*ptr == '\n')
 			{
 				*ptr = '\0';
-=======
-		int startIndex = 0; //Keep track of the start of new integers
-
-		// Loop through buffer parsing for integers
-		for (size_t i = 0; i < bytesRead ; i++)
-		{
-			// New line means an integer has ended
-			if(buffer[i] == '\n')
-			{
-				// Replace \n with a \0 so the integer's subString is null terminated
-				buffer[i] = '\0';
->>>>>>> master
 				line++;
 
 				//Overflow string building to concat across the current and previous buffers
@@ -551,18 +538,11 @@ ReadSet(const char *n, int column, const char *delim)
 					intCount++;
 				}
 
-<<<<<<< HEAD
 				startIndex = index + 1;
 				
 				//Appending the parsed string to the data struct
 				z = strlen(finalString);
 				for (z = 1, t = strtok(finalString, delim);
-=======
-				startIndex = i + 1;
-				//Append to data struct
-
-				for (i = 1, t = strtok(finalString, delim);
->>>>>>> master
 					t != NULL && *t != '#';
 					z++, t = strtok(NULL, delim)) {
 					if (z == column)
@@ -578,11 +558,8 @@ ReadSet(const char *n, int column, const char *delim)
 					AddPoint(s, d);
 			}
 
-<<<<<<< HEAD
 			index++;	
 
-=======
->>>>>>> master
 
 		} //Close For loop
 
