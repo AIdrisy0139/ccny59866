@@ -511,32 +511,13 @@ ReadSet(const char *n, int column, const char *delim)
 			break;
 
 		int startIndex = 0;
-		#if 0
-		NOTE: when to terminate?
-			buffer[BUFFER_SIZE = buffer[256] => ERROR BAD
-			buffer[BUFFER_SIZE-1] = buffer[255] => Reserved Null Terminator BAD
-			buffer[bytesRead] = buffer[255] (in general) =>^
-			buffer[bytesRead-1] = buffer[254] => last valid char from file GOOD
-		#endif
-		//int fCount = 0;
-		int i = 0;
+
+		int index = 0; //Tracks Index ptr is at. Makes some arithmetic easier
 		for(char *ptr = buffer; *ptr != '\0'; ++ptr)
 		//for (size_t i = 0; i < bytesRead ; i++)
 		{
-
-			#if 0
-			printf("fCount = %d, i = %ld \n",fCount, i);
-			if(fCount != i)
-				printf("<><><> fcount {%d} != i {%ld} \n",fCount, i);
-			#endif
-			printf("i = %d \n", i);
-			//printf("*bufferPTR = %c\n", *bufferPtr);
-			//if(memchr(bufferPtr,'\n',1) != NULL) //If not null means its bufferPTR == \n
 			if(*ptr == '\n')
-			//if(buffer[i] == '\n')
 			{
-				//printf(" i = %ld \n", i);
-				//buffer[i] = '\0';
 				*ptr = '\0';
 				line++;
 
@@ -555,8 +536,9 @@ ReadSet(const char *n, int column, const char *delim)
 					intCount++;
 				}
 
-				startIndex = i + 1;
+				startIndex = index + 1;
 				
+				//Appending the parsed string to the data struct
 				z = strlen(finalString);
 				for (z = 1, t = strtok(finalString, delim);
 					t != NULL && *t != '#';
@@ -574,9 +556,8 @@ ReadSet(const char *n, int column, const char *delim)
 					AddPoint(s, d);
 			}
 
-			i++;	
-			//fCount++;
-			//bufferPtr++; //+= sizeof(char);
+			index++;	
+
 
 		} //Close For loop
 
