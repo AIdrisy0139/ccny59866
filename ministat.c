@@ -564,7 +564,8 @@ ReadSet(const char *n, int column, const char *delim)
 		} //Close For loop
 
 		//Overflow Detection when the buffer splits an integer
-		if(buffer[bytesRead-1] != '\n')
+		//if(buffer[bytesRead-1] != '\n')
+		if(*(buffer +bytesRead -1) != '\n')
 		{
 			overFlowFlag = true;
 			overFlowIndex = startIndex;
