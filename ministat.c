@@ -524,7 +524,8 @@ ReadSet(const char *n, int column, const char *delim)
 				//Overflow string building to concat across the current and previous buffers
 				if(overFlowFlag == true)
 				{
-					memset(finalString,'\0', BUFFER_SIZE);
+					//memset(finalString,'\0', BUFFER_SIZE);
+					*finalString = '\0';
 					strcat(finalString, overFlowBuffer + overFlowIndex);
 					strcat(finalString,buffer + startIndex);
 					overFlowFlag = false;
@@ -533,6 +534,7 @@ ReadSet(const char *n, int column, const char *delim)
 				else
 				{
 					//No overflow
+					*finalString = '\0';
 					memset(finalString,'\0', BUFFER_SIZE);
 					strcat(finalString,buffer + startIndex);
 					intCount++;
