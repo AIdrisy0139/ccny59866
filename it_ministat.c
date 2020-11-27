@@ -9,7 +9,7 @@
  *
  */
 #include <sys/ioctl.h>
-
+#include "SDProject/strtod-fast.c"
 #include <err.h>
 #include <math.h>
 #include <stdio.h>
@@ -558,7 +558,7 @@ ReadSet(const char *n, int column, const char *delim)
 				if (t == NULL || *t == '#')
 					continue;
 
-				d = strtod(t, &p);
+				d = strtod_fast(t, &p);
 				if (p != NULL && *p != '\0')
 					err(2, "Invalid data on line %d in %s\n", line, n);
 				if (*finalString != '\0')
@@ -653,7 +653,7 @@ main(int argc, char **argv)
 				usage("Column number should be positive.");
 			break;
 		case 'c':
-			a = strtod(optarg, &p);
+			a = strtod_fast(optarg, &p);
 			if (p != NULL && *p != '\0')
 				usage("Not a floating point number");
 			for (i = 0; i < NCONF; i++)
