@@ -25,7 +25,7 @@
 
 #define NSTUDENT 100
 #define NCONF 6
-#define BUFFER_SIZE 1024 // Amount of characters in the buffer 
+#define BUFFER_SIZE BUFSIZ // Amount of characters in the buffer 
 double const studentpct[] = { 80, 90, 95, 98, 99, 99.5 };
 double student [NSTUDENT + 1][NCONF] = {
 /* inf */	{	1.282,	1.645,	1.960,	2.326,	2.576,	3.090  },
