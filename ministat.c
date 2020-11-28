@@ -8,7 +8,7 @@
  *
  */
 #include <sys/ioctl.h>
-#include "SDProject/strtod-fast.c"
+#include "SDProject/strtod-lite.c"
 #include <err.h>
 #include <math.h>
 #include <stdio.h>
