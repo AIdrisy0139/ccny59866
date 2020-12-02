@@ -455,7 +455,7 @@ ReadSet(const char *n, int column, const char *delim)
 {
 	int fileDescriptor;
 
-	char *p, *t;
+	char *p, *t, *buf;
 
 	char buffer[BUFFER_SIZE];
 	buffer[BUFFER_SIZE-1] = '\0';
@@ -539,12 +539,14 @@ ReadSet(const char *n, int column, const char *delim)
 				}
 
 				startIndex = index + 1;
-				
+
+				buf = finalString; // needed for strsep to work
+
 				//Appending the parsed string to the data struct
 				z = strlen(finalString);
-				for (z = 1, t = strtok(finalString, delim);
+				for (z = 1, t = strsep(&buf, delim);
 					t != NULL && *t != '#';
-					z++, t = strtok(NULL, delim)) {
+					z++, t = strsep(&buf, delim)) {
 					if (z == column)
 						break;
 				}
