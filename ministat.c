@@ -450,6 +450,7 @@ dbl_cmp(const void *a, const void *b)
 		return (0);
 }
 
+
 static struct dataset *
 ReadSet(const char *n, int column, const char *delim)
 {
@@ -480,7 +481,7 @@ ReadSet(const char *n, int column, const char *delim)
 		n = STDIN_FILENO ;
 	} else {
 		// Open the file specified
-		// n = argv[1];
+		// n = argv[1:];
 		fileDescriptor = open(n, O_RDONLY);
 	}
 	if (fileDescriptor == -1) // Open reutrns -1 on failure
@@ -540,8 +541,7 @@ ReadSet(const char *n, int column, const char *delim)
 					intCount++;
 				}
 
-				startIndex = index + 1;
-				
+				startIndex = index + 1;	
 				//Appending the parsed string to the data struct
 				z = strlen(finalString);
 				for (z = 1, t = strtok(finalString, delim);
@@ -559,10 +559,7 @@ ReadSet(const char *n, int column, const char *delim)
 				if (*finalString != '\0')
 					AddPoint(s, d);
 			}
-
 			index++;	
-
-
 		} //Close For loop
 
 		//Overflow Detection when the buffer splits an integer
