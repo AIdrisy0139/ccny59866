@@ -26,6 +26,7 @@
 #define NSTUDENT 100
 #define NCONF 6
 #define BUFFER_SIZE BUFSIZ // Amount of characters in the buffer 
+#define THREAD_COUNT 4	// Number of threads to read each file
 double const studentpct[] = { 80, 90, 95, 98, 99, 99.5 };
 double student [NSTUDENT + 1][NCONF] = {
 /* inf */	{	1.282,	1.645,	1.960,	2.326,	2.576,	3.090  },
@@ -450,14 +451,18 @@ dbl_cmp(const void *a, const void *b)
 		return (0);
 }
 
-
-static struct dataset *
-ReadSet(const char *n, int column, const char *delim)
+void 
+ReadPartition(int fd, size_t partitionSize, off_t startPoint, 
+				const char *delim,int column, const char * n, struct dataset* s)
 {
-	int fileDescriptor;
-
+	printf("FD = %d, partitionSize = %ld, startPoint = %ld \n", fd, partitionSize, startPoint);
+	
 	char *p, *t;
 
+	size_t totalBytesRead = 0;
+	off_t offset = startPoint;
+
+	
 	char buffer[BUFFER_SIZE];
 	buffer[BUFFER_SIZE-1] = '\0';
 
@@ -468,28 +473,14 @@ ReadSet(const char *n, int column, const char *delim)
 	char finalString[BUFFER_SIZE];
 	finalString[BUFFER_SIZE-1] = '\0';
 
-	struct dataset *s;
-	double d;
-	int line;
 	int z;
-	if (n == NULL) {
-		// No I/O file specified so set up opening FD
-		fileDescriptor = STDIN_FILENO;
-		n = STDIN_FILENO;
-	} else if (!strcmp(n, "-")) {
-		fileDescriptor = STDIN_FILENO;
-		n = STDIN_FILENO ;
-	} else {
-		// Open the file specified
-		// n = argv[1:];
-		fileDescriptor = open(n, O_RDONLY);
-	}
-	if (fileDescriptor == -1) // Open reutrns -1 on failure
-		err(1, "Cannot open %s", n);
+	int line = 0;
+	double d;
 
-	s = NewSet();
-	s->name = strdup(n);
-	line = 0;
+	int bytesRead =0;
+	int intCount = 0;
+	int overFlowIndex = 0;
+
 
 	#if 0
 		Read BUFFER_SIZE many bytes from the file
@@ -501,13 +492,17 @@ ReadSet(const char *n, int column, const char *delim)
 			Copy Contents into an overflow buffer
 			Keep track of subString start in the overflow buffer
 	#endif
-	int bytesRead = 1;
-	int intCount = 0;
-	int overFlowIndex = 0;
-	while (bytesRead != 0 )
+
+	while(totalBytesRead < partitionSize)
 	{
-		bytesRead = read(fileDescriptor, &buffer, BUFFER_SIZE-1);
-		//EOF
+		if(BUFFER_SIZE > partitionSize - totalBytesRead)
+			bytesRead = pread(fd, &buffer, partitionSize - totalBytesRead, offset);
+		else
+			bytesRead = pread(fd, &buffer, BUFFER_SIZE, offset);
+		
+		totalBytesRead += bytesRead;
+		offset += bytesRead;
+		printf("OffSet = %ld \n", offset);
 		if(bytesRead == 0)
 			break;
 
@@ -571,7 +566,64 @@ ReadSet(const char *n, int column, const char *delim)
 			memcpy(overFlowBuffer,buffer,BUFFER_SIZE);
 		}
 
-	}//Close While Loop
+	} // Close While Loop
+	
+}
+
+
+static struct dataset *
+ReadSet(const char *n, int column, const char *delim)
+{
+	int fileDescriptor;
+
+
+
+	char buffer[BUFFER_SIZE];
+	buffer[BUFFER_SIZE-1] = '\0';
+
+
+	struct dataset *s;
+
+	int line;
+
+	if (n == NULL) {
+		// No I/O file specified so set up opening FD
+		fileDescriptor = STDIN_FILENO;
+		n = STDIN_FILENO;
+	} else if (!strcmp(n, "-")) {
+		fileDescriptor = STDIN_FILENO;
+		n = STDIN_FILENO ;
+	} else {
+		// Open the file specified
+		// n = argv[1:];
+		fileDescriptor = open(n, O_RDONLY);
+	}
+	if (fileDescriptor == -1) // Open reutrns -1 on failure
+		err(1, "Cannot open %s", n);
+
+	s = NewSet();
+	s->name = strdup(n);
+
+	// Get Partition Size
+	struct stat st;
+	fstat(fileDescriptor, &st);
+	size_t fullSize = st.st_size;
+
+	size_t partitionSize = fullSize / THREAD_COUNT;
+	size_t leftOver = fullSize % THREAD_COUNT;
+
+	printf("TotalSize = %ld , PartitionSize = %ld , leftOver = %ld \n", fullSize, partitionSize,leftOver);
+
+	// Dispatch Work to threads
+	for (size_t i = 0; i < THREAD_COUNT; i++)
+	{	
+		if(i == THREAD_COUNT -1)
+			ReadPartition(fileDescriptor, partitionSize+leftOver,partitionSize*i,
+				delim, column, n, s);
+		else
+			ReadPartition(fileDescriptor, partitionSize, partitionSize*i,
+				delim, column, n, s);
+	}
 
 	int ret = close(fileDescriptor);
 	if( ret == -1)
