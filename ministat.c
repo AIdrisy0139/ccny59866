@@ -455,7 +455,7 @@ void
 ReadPartition(int fd, size_t partitionSize, off_t startPoint, 
 				const char *delim,int column, const char * n, struct dataset* s)
 {
-	printf("FD = %d, partitionSize = %ld, startPoint = %ld \n", fd, partitionSize, startPoint);
+	printf(">>FD = %d, partitionSize = %ld, startPoint = %ld \n", fd, partitionSize, startPoint);
 	
 	char *p, *t;
 
@@ -502,7 +502,9 @@ ReadPartition(int fd, size_t partitionSize, off_t startPoint,
 		
 		totalBytesRead += bytesRead;
 		offset += bytesRead;
+		
 		printf("OffSet = %ld \n", offset);
+		
 		if(bytesRead == 0)
 			break;
 
@@ -510,7 +512,6 @@ ReadPartition(int fd, size_t partitionSize, off_t startPoint,
 
 		int index = 0; //Tracks Index ptr is at. Makes some arithmetic easier
 		for(char *ptr = buffer; *ptr != '\0'; ++ptr)
-		//for (size_t i = 0; i < bytesRead ; i++)
 		{
 			if(*ptr == '\n')
 			{
@@ -565,9 +566,7 @@ ReadPartition(int fd, size_t partitionSize, off_t startPoint,
 			overFlowIndex = startIndex;
 			memcpy(overFlowBuffer,buffer,BUFFER_SIZE);
 		}
-
 	} // Close While Loop
-	
 }
 
 
@@ -609,20 +608,17 @@ ReadSet(const char *n, int column, const char *delim)
 	fstat(fileDescriptor, &st);
 	size_t fullSize = st.st_size;
 
-	size_t partitionSize = fullSize / THREAD_COUNT;
+	size_t targetSize = fullSize / THREAD_COUNT;
 	size_t leftOver = fullSize % THREAD_COUNT;
+	size_t dispatchedSize = 0;
+	size_t partitionStart, partitionEnd = 0;
 
-	printf("TotalSize = %ld , PartitionSize = %ld , leftOver = %ld \n", fullSize, partitionSize,leftOver);
+	printf("TotalSize = %ld , TargetSize = %ld , leftOver = %ld \n", fullSize, targetSize,leftOver);
 
 	// Dispatch Work to threads
 	for (size_t i = 0; i < THREAD_COUNT; i++)
 	{	
-		if(i == THREAD_COUNT -1)
-			ReadPartition(fileDescriptor, partitionSize+leftOver,partitionSize*i,
-				delim, column, n, s);
-		else
-			ReadPartition(fileDescriptor, partitionSize, partitionSize*i,
-				delim, column, n, s);
+		dispatchedSize = targetSize;
 	}
 
 	int ret = close(fileDescriptor);
