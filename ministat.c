@@ -26,7 +26,7 @@
 #define NSTUDENT 100
 #define NCONF 6
 #define BUFFER_SIZE BUFSIZ // Amount of characters in the buffer 
-#define THREAD_COUNT 4	// Number of threads to read each file
+#define THREAD_COUNT 3	// Number of threads to read each file
 double const studentpct[] = { 80, 90, 95, 98, 99, 99.5 };
 double student [NSTUDENT + 1][NCONF] = {
 /* inf */	{	1.282,	1.645,	1.960,	2.326,	2.576,	3.090  },
@@ -451,6 +451,7 @@ dbl_cmp(const void *a, const void *b)
 		return (0);
 }
 
+
 void 
 ReadPartition(int fd, size_t partitionSize, off_t startPoint, 
 				const char *delim,int column, const char * n, struct dataset* s)
@@ -569,17 +570,29 @@ ReadPartition(int fd, size_t partitionSize, off_t startPoint,
 	} // Close While Loop
 }
 
+struct partition
+{
+	size_t start;
+	size_t end;
+};
 
+struct partition *
+NewPartition(size_t s, size_t e)
+{
+	struct partition * p;
+
+	p = malloc(sizeof *p);
+	p->start = s;
+	p->end = e;
+	return p;
+}
 static struct dataset *
 ReadSet(const char *n, int column, const char *delim)
 {
 	int fileDescriptor;
 
-
-
 	char buffer[BUFFER_SIZE];
 	buffer[BUFFER_SIZE-1] = '\0';
-
 
 	struct dataset *s;
 
@@ -603,6 +616,8 @@ ReadSet(const char *n, int column, const char *delim)
 	s = NewSet();
 	s->name = strdup(n);
 
+
+
 	// Get Partition Size
 	struct stat st;
 	fstat(fileDescriptor, &st);
@@ -611,15 +626,40 @@ ReadSet(const char *n, int column, const char *delim)
 	size_t targetSize = fullSize / THREAD_COUNT;
 	size_t leftOver = fullSize % THREAD_COUNT;
 	size_t dispatchedSize = 0;
-	size_t partitionStart, partitionEnd = 0;
+	size_t partitionStart = 0;
 
+	struct partition * allPartitions[THREAD_COUNT];
 	printf("TotalSize = %ld , TargetSize = %ld , leftOver = %ld \n", fullSize, targetSize,leftOver);
 
 	// Dispatch Work to threads
+	#if 0
+	Keep track of two pointers per partition.
+	One for the start and one for the end. 
+	Set the end to the expected end. 
+	Read forward char by char looking for a \n.
+	Per car increment the previous partitions end ptr by 1.
+	#endif
+	char lookAhead[2] = {'\0','\0'};
+
 	for (size_t i = 0; i < THREAD_COUNT; i++)
 	{	
-		dispatchedSize = targetSize;
-	}
+		size_t partitionEnd = partitionStart + targetSize;
+
+
+		pread(fileDescriptor,lookAhead,1,partitionEnd - 1);
+		while(lookAhead[0] != '\n')
+		{
+			printf(":InLoop:Look ahead char = [%c]  \n",lookAhead[0]);
+			partitionEnd++;
+			pread(fileDescriptor,lookAhead,1,partitionEnd -1);
+		}
+		printf(":OutLoop:Look ahead char = [%c]  \n",lookAhead[0]);
+
+		struct partition * currentPartition =  NewPartition(partitionStart, partitionEnd);
+		printf("Start = %ld, End = %ld  \n",currentPartition->start, currentPartition->end);
+		allPartitions[i] = currentPartition;
+		partitionStart = partitionEnd + 1;
+	}	
 
 	int ret = close(fileDescriptor);
 	if( ret == -1)
