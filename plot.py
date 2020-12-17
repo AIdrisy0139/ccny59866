@@ -7,53 +7,56 @@ results = {}
 
 def runInputDeck():
     global results
-    ministatPath = "/home/aidrisy/ministat"
+    ministatPaths = ["/home/aidrisy/ccny59866/","/home/aidrisy/ministat"]
     inputFilesPath = "~/ccny59866/inputFiles"
         
 
     files = os.listdir("inputFiles")
-    os.chdir(ministatPath)
-    print(f"CWD Changed to :: {os.getcwd()}")
-    for x in files:
-        iFile = os.path.join(inputFilesPath,x)
-        start = time.time()
-        os.system(f"./ministat -q {iFile}")
-        end = time.time()
-        elapsed = end - start
-        print(f"Time elapsed for {iFile} = {elapsed}")
-        results[int(x)] = elapsed
+    for path in ministatPaths:
+        os.chdir(path)
+        print(f"CWD Changed to :: {os.getcwd()}")
+        results[path] = {}
+        for x in files:
+            iFile = os.path.join(inputFilesPath,x)
+            start = time.time()
+            os.system(f"./ministat -q {iFile}")
+            end = time.time()
+            elapsed = end - start
+            print(f"Time elapsed for {iFile} = {elapsed}")
+            results[path][int(x)] = elapsed
     
-    keys = results.keys()
 
-    times = []
-    for key in keys:
-        times.append(results[key])
-        
-    return keys, times
-
-def sortAndPlot(keys,times):
-    keys = list(keys)
-    keys.sort()
-    print(f"Keys = {keys}")
-    #print(f"Times = {times}")
+def sortAndPlot():
+    global results
     plotTimes = []
-    for k in keys:
-        plotTimes.append(results[k])
+    labels = []
+    for d in results:
+        subDict = results[d]
+        print(d)
+        labels.append(d)
+        keys = list(subDict.keys())
+        keys.sort()
+       # print(f"Keys = {keys}")
+        row = []
+        for k in keys:
+            row.append(subDict[k])
+       # print(f"Row = {row}")
+        plotTimes.append(row)
 
-    print(plotTimes)
-    plt.title("Original Ministat")
+    print("---")
+
+    plt.title("µ-Opt Ministat vs Stock Ministat")
     plt.xlabel("Size of file in ints")
-    #plt.xticks(keys)
     plt.ylabel("Running Time (Secs)")
-    plt.plot(keys,plotTimes,'x--')
-    #plt.scatter(keys,plotTimes)
-    plt.savefig("plot.png")
+    for i in range(0,len(plotTimes)):
+        plt.plot(keys,plotTimes[i],'x--',label=labels[i])
+    plt.legend(loc="upper left")
+    plt.savefig("micro_vs_stock.png")
+
 
 def main():
-    
-    keys, times = runInputDeck()
+    runInputDeck()
     os.chdir("/home/aidrisy/ccny59866")
     print(f"CWD Changed to :: {os.getcwd()}")
-    sortAndPlot(keys,times)
-
+    sortAndPlot()
 main()
