@@ -22,6 +22,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include "queue.h"
+#include <pthread.h>
 
 #define NSTUDENT 100
 #define NCONF 6
@@ -451,17 +452,49 @@ dbl_cmp(const void *a, const void *b)
 		return (0);
 }
 
+struct partition
+{
+	int fd;
+	size_t start;
+	size_t end;
+	const char *delim;
+	int col;
+	struct dataset * dataSet;
+};
+
+struct partition *
+NewPartition(size_t s, size_t e, int fd, const char *d, struct dataset * ds, int c)
+{
+	struct partition * p;
+
+	p = malloc(sizeof *p);
+	p->start = s;
+	p->end = e;
+
+	p->fd = fd;
+	p->delim = d;
+	p->col = c;
+	p->dataSet = ds;
+	return p;
+}
 
 void 
-ReadPartition(int fd, size_t partitionSize, off_t startPoint, 
-				const char *delim,int column, const char * n, struct dataset* s)
+ReadPartition(struct partition * partition)
 {
-	printf(">>FD = %d, partitionSize = %ld, startPoint = %ld \n", fd, partitionSize, startPoint);
+	// Unpack partition struct
+	int fd = partition->fd;
+	size_t partitionStart = partition->start;
+	size_t partitionEnd = partition->end;
+	int partitionSize = partitionEnd - partitionStart +1; 
+	const char * delim = partition->delim;
+	int column = partition->col;
+	struct dataset * s = partition->dataSet;
 	
+
 	char *p, *t;
 
 	size_t totalBytesRead = 0;
-	off_t offset = startPoint;
+	off_t offset = partitionStart;
 
 	
 	char buffer[BUFFER_SIZE];
@@ -496,15 +529,16 @@ ReadPartition(int fd, size_t partitionSize, off_t startPoint,
 
 	while(totalBytesRead < partitionSize)
 	{
+		//Need this because partitions dont have EOF termination, and can have multiple \ns in them
 		if(BUFFER_SIZE > partitionSize - totalBytesRead)
 			bytesRead = pread(fd, &buffer, partitionSize - totalBytesRead, offset);
 		else
 			bytesRead = pread(fd, &buffer, BUFFER_SIZE, offset);
 		
+		printf("OffSet = %ld  bytesRead = %d \n", offset, bytesRead);
 		totalBytesRead += bytesRead;
 		offset += bytesRead;
 		
-		printf("OffSet = %ld \n", offset);
 		
 		if(bytesRead == 0)
 			break;
@@ -552,7 +586,7 @@ ReadPartition(int fd, size_t partitionSize, off_t startPoint,
 
 				d = strtod(t, &p);
 				if (p != NULL && *p != '\0')
-					err(2, "Invalid data on line %d in %s\n", line, n);
+					err(2, "Invalid data on line %d in\n", line);
 				if (*finalString != '\0')
 					AddPoint(s, d);
 			}
@@ -570,33 +604,13 @@ ReadPartition(int fd, size_t partitionSize, off_t startPoint,
 	} // Close While Loop
 }
 
-struct partition
-{
-	size_t start;
-	size_t end;
-};
-
-struct partition *
-NewPartition(size_t s, size_t e)
-{
-	struct partition * p;
-
-	p = malloc(sizeof *p);
-	p->start = s;
-	p->end = e;
-	return p;
-}
 static struct dataset *
 ReadSet(const char *n, int column, const char *delim)
 {
 	int fileDescriptor;
 
-	char buffer[BUFFER_SIZE];
-	buffer[BUFFER_SIZE-1] = '\0';
-
 	struct dataset *s;
 
-	int line;
 
 	if (n == NULL) {
 		// No I/O file specified so set up opening FD
@@ -625,7 +639,6 @@ ReadSet(const char *n, int column, const char *delim)
 
 	size_t targetSize = fullSize / THREAD_COUNT;
 	size_t leftOver = fullSize % THREAD_COUNT;
-	size_t dispatchedSize = 0;
 	size_t partitionStart = 0;
 
 	struct partition * allPartitions[THREAD_COUNT];
@@ -637,30 +650,52 @@ ReadSet(const char *n, int column, const char *delim)
 	One for the start and one for the end. 
 	Set the end to the expected end. 
 	Read forward char by char looking for a \n.
-	Per car increment the previous partitions end ptr by 1.
+	Per char increment the partitions end ptr by 1.
 	#endif
-	char lookAhead[2] = {'\0','\0'};
+	//Must be an array to satisfy pread
+	char lookAhead[] = {'X','\0'};
 
 	for (size_t i = 0; i < THREAD_COUNT; i++)
 	{	
-		size_t partitionEnd = partitionStart + targetSize;
+		size_t partitionEnd = partitionStart + targetSize -1;
 
 
-		pread(fileDescriptor,lookAhead,1,partitionEnd - 1);
+		pread(fileDescriptor,lookAhead,1, partitionEnd);
+		//printf(":PreLoop:Look ahead char = [%s], partitionEnd = [%ld]  \n",
+		//			lookAhead, partitionEnd);
 		while(lookAhead[0] != '\n')
 		{
-			printf(":InLoop:Look ahead char = [%c]  \n",lookAhead[0]);
+			//printf(":InLoop:Look ahead char = [%s]  \n",lookAhead);
 			partitionEnd++;
-			pread(fileDescriptor,lookAhead,1,partitionEnd -1);
+			pread(fileDescriptor,lookAhead,1,partitionEnd);
 		}
-		printf(":OutLoop:Look ahead char = [%c]  \n",lookAhead[0]);
+		//printf(":OutLoop:Look ahead char = [%s]  \n",lookAhead);
 
-		struct partition * currentPartition =  NewPartition(partitionStart, partitionEnd);
-		printf("Start = %ld, End = %ld  \n",currentPartition->start, currentPartition->end);
+		struct partition * currentPartition =  
+			NewPartition(partitionStart, partitionEnd,fileDescriptor,delim,s,column);
+
+		//printf("Start = %ld, End = %ld  \n",currentPartition->start, currentPartition->end);
 		allPartitions[i] = currentPartition;
 		partitionStart = partitionEnd + 1;
 	}	
 
+	//Create and Execute Threads
+	pthread_t * threads = malloc(sizeof(pthread_t) * THREAD_COUNT);
+	if (threads == NULL) {
+		perror("error: failed to allocate threads");
+		exit(EXIT_FAILURE);
+	}
+
+	for (size_t i = 0; i < THREAD_COUNT; i++)
+	{
+		struct partition * current = allPartitions[i];
+		printf("Index = %ld, Partition Start = %ld, Partition End = %ld \n", 
+				i, current->start, current->end);
+		//pthread_create(&threads[i],NULL, ReadPartition,current);
+	
+		//ReadPartition(current);
+	}
+	
 	int ret = close(fileDescriptor);
 	if( ret == -1)
 	{
