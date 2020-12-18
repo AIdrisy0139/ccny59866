@@ -479,9 +479,10 @@ NewPartition(size_t s, size_t e, int fd, const char *d, struct dataset * ds, int
 }
 
 void 
-ReadPartition(struct partition * partition)
+ReadPartition(void * partition)
 {
 	// Unpack partition struct
+	struct partition(partition);
 	int fd = partition->fd;
 	size_t partitionStart = partition->start;
 	size_t partitionEnd = partition->end;
@@ -691,7 +692,7 @@ ReadSet(const char *n, int column, const char *delim)
 		struct partition * current = allPartitions[i];
 		printf("Index = %ld, Partition Start = %ld, Partition End = %ld \n", 
 				i, current->start, current->end);
-		//pthread_create(&threads[i],NULL, ReadPartition,current);
+		pthread_create(&threads[i],NULL, ReadPartition,current);
 	
 		//ReadPartition(current);
 	}
