@@ -478,11 +478,11 @@ NewPartition(size_t s, size_t e, int fd, const char *d, struct dataset * ds, int
 	return p;
 }
 
-void 
-ReadPartition(void * partition)
+void  *
+ReadPartition(void * part)
 {
 	// Unpack partition struct
-	struct partition(partition);
+	struct partition * partition = part;//(struct partition *) partition;
 	int fd = partition->fd;
 	size_t partitionStart = partition->start;
 	size_t partitionEnd = partition->end;
@@ -536,7 +536,7 @@ ReadPartition(void * partition)
 		else
 			bytesRead = pread(fd, &buffer, BUFFER_SIZE, offset);
 		
-		printf("OffSet = %ld  bytesRead = %d \n", offset, bytesRead);
+		//printf("OffSet = %ld  bytesRead = %d \n", offset, bytesRead);
 		totalBytesRead += bytesRead;
 		offset += bytesRead;
 		
@@ -662,11 +662,11 @@ ReadSet(const char *n, int column, const char *delim)
 
 
 		pread(fileDescriptor,lookAhead,1, partitionEnd);
-		//printf(":PreLoop:Look ahead char = [%s], partitionEnd = [%ld]  \n",
-		//			lookAhead, partitionEnd);
+		printf(":PreLoop %ld :Look ahead char = [%s], partitionEnd = [%ld]  \n",
+					i,lookAhead, partitionEnd);
 		while(lookAhead[0] != '\n')
 		{
-			//printf(":InLoop:Look ahead char = [%s]  \n",lookAhead);
+			printf(":InLoop:Look ahead char = [%s]  \n",lookAhead);
 			partitionEnd++;
 			pread(fileDescriptor,lookAhead,1,partitionEnd);
 		}
@@ -692,10 +692,27 @@ ReadSet(const char *n, int column, const char *delim)
 		struct partition * current = allPartitions[i];
 		printf("Index = %ld, Partition Start = %ld, Partition End = %ld \n", 
 				i, current->start, current->end);
-		pthread_create(&threads[i],NULL, ReadPartition,current);
-	
-		//ReadPartition(current);
+
+		/*
+		if(pthread_create(&threads[i],NULL, ReadPartition,current) !=0)
+		{
+			perror("ERROR creating threads");
+			exit(EXIT_FAILURE);
+		}*/
+		ReadPartition(current);
 	}
+
+	/*
+	// Join executed threads
+	for (size_t i = 0; i < THREAD_COUNT; i++)
+	{
+		if(pthread_join(threads[i],NULL)!=0)
+		{
+			perror("ERROR joining threads");
+			exit(EXIT_FAILURE);
+		}
+	}*/
+	
 	
 	int ret = close(fileDescriptor);
 	if( ret == -1)
