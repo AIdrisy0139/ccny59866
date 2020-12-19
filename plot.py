@@ -7,7 +7,8 @@ results = {}
 
 def runInputDeck():
     global results
-    ministatPaths = ["/home/aidrisy/ccny59866/","/home/aidrisy/ministat"]
+    ministatPaths = ["/home/aidrisy/1_thread","/home/aidrisy/2_thread","/home/aidrisy/4_thread",
+                    "/home/aidrisy/6_thread","/home/aidrisy/8_thread","/home/aidrisy/ministat"]
     inputFilesPath = "~/ccny59866/inputFiles"
         
     execCount = 1000
@@ -54,6 +55,7 @@ def sortAndPlot():
 
     print(f"Difs = {diffs}")
 
+    plt.figure(figsize=(15,10))
     plt.title("|| Ministat vs Stock Ministat")
     plt.xlabel("Size of file in ints")
     plt.ylabel("Running Time (Secs)")

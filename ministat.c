@@ -27,7 +27,7 @@
 #define NSTUDENT 100
 #define NCONF 6
 #define BUFFER_SIZE BUFSIZ // Amount of characters in the buffer 
-#define THREAD_COUNT 1	// Number of threads to read each file
+#define THREAD_COUNT 4	// Number of threads to read each file
 
 double const studentpct[] = { 80, 90, 95, 98, 99, 99.5 };
 double student [NSTUDENT + 1][NCONF] = {
@@ -634,7 +634,7 @@ ReadPartition(void * part)
 
 				startIndex = index + 1;	
 				//Appending the parsed string to the data struct
-				printf("Line : %d = %s\n", line, finalString);
+				//printf("Line : %d = %s\n", line, finalString);
 				z = strlen(finalString);
 				
 				for (z = 1, t = strtok(finalString, delim);
