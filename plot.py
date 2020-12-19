@@ -7,10 +7,11 @@ results = {}
 
 def runInputDeck():
     global results
-    ministatPaths = ["/home/aidrisy/ccny59866/","/home/aidrisy/ministat"]
+    ministatPaths = ["/home/aidrisy/1_thread","/home/aidrisy/2_thread","/home/aidrisy/4_thread",
+                    "/home/aidrisy/6_thread","/home/aidrisy/8_thread","/home/aidrisy/ministat"]
     inputFilesPath = "~/ccny59866/inputFiles"
         
-
+    execCount = 1000
     files = os.listdir("inputFiles")
     for path in ministatPaths:
         os.chdir(path)
@@ -24,6 +25,8 @@ def runInputDeck():
             elapsed = end - start
             print(f"Time elapsed for {iFile} = {elapsed}")
             results[path][int(x)] = elapsed
+    
+    print(results)
 
 def sortAndPlot():
     global results
@@ -39,18 +42,27 @@ def sortAndPlot():
         row = []
         for k in keys:
             row.append(subDict[k])
-       # print(f"Row = {row}")
+        print(f"Row = {row}")
         plotTimes.append(row)
 
     print("---")
 
-    plt.title("µ-Opt Ministat vs Stock Ministat")
+    diffs = []
+    for i in range(0,len(plotTimes[0])):
+        # Custom - stock
+        delta = plotTimes[0][i] - plotTimes[1][i]
+        diffs.append(delta)
+
+    print(f"Difs = {diffs}")
+
+    plt.figure(figsize=(15,10))
+    plt.title("|| Ministat vs Stock Ministat")
     plt.xlabel("Size of file in ints")
     plt.ylabel("Running Time (Secs)")
     for i in range(0,len(plotTimes)):
         plt.plot(keys,plotTimes[i],'x--',label=labels[i])
     plt.legend(loc="upper left")
-    plt.savefig("micro_vs_stock.png")
+    plt.savefig("parallel_vs_stock.png")
 
 
 def main():
