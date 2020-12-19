@@ -28,7 +28,6 @@
 #define NCONF 6
 #define BUFFER_SIZE BUFSIZ // Amount of characters in the buffer 
 #define THREAD_COUNT 4	// Number of threads to read each file
-pthread_mutex_t mutex_ds = PTHREAD_MUTEX_INITIALIZER;
 
 double const studentpct[] = { 80, 90, 95, 98, 99, 99.5 };
 double student [NSTUDENT + 1][NCONF] = {
@@ -217,7 +216,7 @@ MergeDatasets(struct dataset *dest, struct dataset *src)
 	{
 		printf("Merge Point %ld = %f \n", i, dest->points[i]);
 	}
-	#endif;
+	#endif
 	printf("--End Merge \n");
 }
 static double
@@ -545,7 +544,7 @@ ReadPartition(void * part)
 	int column = partition->col;
 	struct dataset * localSet = partition->dataSet;
 	int threadNumber = partition->thread;
-	printf("Thread Number = %d \n",threadNumber);
+	//printf("Thread Number = %d \n",threadNumber);
 
 	//Thread local dataset setup
 	char str[2];
@@ -635,12 +634,14 @@ ReadPartition(void * part)
 				//Appending the parsed string to the data struct
 				//printf("%s\n", finalString);
 				z = strlen(finalString);
+				
 				for (z = 1, t = strtok(finalString, delim);
 					t != NULL && *t != '#';
 					z++, t = strtok(NULL, delim)) {
 					if (z == column)
 						break;
 				}
+				
 				if (t == NULL || *t == '#')
 					continue;
 
@@ -649,9 +650,7 @@ ReadPartition(void * part)
 					err(2, "Invalid data on line %d in\n", line);
 				if (*finalString != '\0')
 				{
-					pthread_mutex_lock(&mutex_ds);
 					AddPoint(localSet, d);
-					pthread_mutex_unlock(&mutex_ds);
 				}
 			}
 			index++;	

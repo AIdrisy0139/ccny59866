@@ -10,7 +10,7 @@ def runInputDeck():
     ministatPaths = ["/home/aidrisy/ccny59866/","/home/aidrisy/ministat"]
     inputFilesPath = "~/ccny59866/inputFiles"
         
-
+    execCount = 1000
     files = os.listdir("inputFiles")
     for path in ministatPaths:
         os.chdir(path)
@@ -25,6 +25,7 @@ def runInputDeck():
             print(f"Time elapsed for {iFile} = {elapsed}")
             results[path][int(x)] = elapsed
     
+    print(results)
 
 def sortAndPlot():
     global results
