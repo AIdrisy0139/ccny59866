@@ -205,7 +205,7 @@ MergeDatasets(struct dataset *dest, struct dataset *src)
 
 	dest->points = (double *) newPoints;
 	dest->sy += src->sy;
-	dest->syy = dest->syy + src->syy*src->syy; //TODO: Verify if this formula is right
+	dest->syy += src->syy; //TODO: Verify if this formula is right
 	dest->n += src->n;
 	#if 0
 	printf("-Merged Points\n");
@@ -714,7 +714,7 @@ ReadSet(const char *n, int column, const char *delim)
 	Per char increment the partitions end ptr by 1.
 	#endif
 	size_t targetSize = fullSize / THREAD_COUNT;
-	size_t leftOver = fullSize % THREAD_COUNT;
+	//size_t leftOver = fullSize % THREAD_COUNT;
 	size_t partitionStart = 0;
 	//printf("TotalSize = %ld , TargetSize = %ld , leftOver = %ld \n", fullSize, targetSize,leftOver);
 	
