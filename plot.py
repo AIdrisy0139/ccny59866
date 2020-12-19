@@ -51,7 +51,7 @@ def sortAndPlot():
         delta = plotTimes[0][i] - plotTimes[1][i]
         diffs.append(delta)
 
-    print(diffs)
+    print(f"Difs = {diffs}")
 
     plt.title("|| Ministat vs Stock Ministat")
     plt.xlabel("Size of file in ints")

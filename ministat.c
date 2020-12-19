@@ -140,10 +140,10 @@ static char symbol[MAX_DS] = { ' ', 'x', '+', '*', '%', '#', '@', 'O' };
 
 struct dataset {
 	char *name;
-	double	*points;
-	unsigned lpoints;
+	double	*points; // Values themselves
+	unsigned lpoints; 
 	double sy, syy;
-	unsigned n;
+	unsigned n; //Number of points in the ds
 };
 
 static struct dataset *
@@ -174,6 +174,52 @@ AddPoint(struct dataset *ds, double a)
 	ds->syy += a * a;
 }
 
+/*
+	Pre-Condition: src and dest are valid ptrs to dataset structs
+	Post-Condition: dest's values reflect having added the points in src to it
+
+	Merge src into dest
+*/
+static void
+MergeDatasets(struct dataset *dest, struct dataset *src)
+{	
+	printf("--Start Merge for {%s} \n", src->name);
+
+	#if 0
+	printf("-Dest Points , dest n = %d\n",dest->n);
+
+	for (size_t i = 0; i < dest->n; i++)
+	{
+		printf("Dest Point :%ld = %f \n", i, dest->points[i]);
+	}
+	printf("-Src Points , src n = %d \n",src->n);
+	for (size_t i = 0; i < src->n; i++)
+	{
+		printf("Src Point :%ld = %f \n", i, src->points[i]);
+	}
+	#endif
+
+	size_t newPointsByteLen = sizeof(double) * (dest->n + src->n);
+	printf("newPointsByteLen = %ld\n",newPointsByteLen);
+	double * newPoints = malloc(newPointsByteLen) ;
+	printf("Dest Byte length = %ld \n", dest->n*sizeof(double));
+	printf("Src Byte length = %ld \n", src->n*sizeof(double));
+	memcpy(newPoints,dest->points, dest->n * sizeof(double));
+	memcpy(&newPoints[dest->n], src->points, src->n * sizeof(double));
+
+	dest->points = (double *) newPoints;
+	dest->sy += src->sy;
+	dest->syy = dest->syy + src->syy*src->syy; //TODO: Verify if this formula is right
+	dest->n += src->n;
+	#if 0
+	printf("-Merged Points\n");
+	for (size_t i = 0; i < dest->n; i++)
+	{
+		printf("Merge Point %ld = %f \n", i, dest->points[i]);
+	}
+	#endif;
+	printf("--End Merge \n");
+}
 static double
 Min(struct dataset *ds)
 {
@@ -482,6 +528,10 @@ NewPartition(size_t s, size_t e, int fd, const char *d, struct dataset * ds, int
 	return p;
 }
 
+/*
+	Pre-Condition: Part ptr to a valid partition struct of a file
+	Post-Condition: A new dataset is created that holds all the values for this partition
+*/
 void  *
 ReadPartition(void * part)
 {
@@ -493,10 +543,15 @@ ReadPartition(void * part)
 	int partitionSize = partitionEnd - partitionStart +1; 
 	const char * delim = partition->delim;
 	int column = partition->col;
-	struct dataset * s = partition->dataSet;
+	struct dataset * localSet = partition->dataSet;
 	int threadNumber = partition->thread;
 	printf("Thread Number = %d \n",threadNumber);
 
+	//Thread local dataset setup
+	char str[2];
+	sprintf(str, "%d", threadNumber);
+	localSet->name = str;
+	//printf("LocalSet Name = %s\n",localSet->name);
 	char *p, *t;
 
 	size_t totalBytesRead = 0;
@@ -578,7 +633,7 @@ ReadPartition(void * part)
 
 				startIndex = index + 1;	
 				//Appending the parsed string to the data struct
-				printf("%s\n", finalString);
+				//printf("%s\n", finalString);
 				z = strlen(finalString);
 				for (z = 1, t = strtok(finalString, delim);
 					t != NULL && *t != '#';
@@ -595,7 +650,7 @@ ReadPartition(void * part)
 				if (*finalString != '\0')
 				{
 					pthread_mutex_lock(&mutex_ds);
-					AddPoint(s, d);
+					AddPoint(localSet, d);
 					pthread_mutex_unlock(&mutex_ds);
 				}
 			}
@@ -643,14 +698,9 @@ ReadSet(const char *n, int column, const char *delim)
 	fstat(fileDescriptor, &st);
 	size_t fullSize = st.st_size;
 
-	size_t targetSize = fullSize / THREAD_COUNT;
-	size_t leftOver = fullSize % THREAD_COUNT;
-	size_t partitionStart = 0;
 
-	struct partition * allPartitions[THREAD_COUNT];
-	printf("TotalSize = %ld , TargetSize = %ld , leftOver = %ld \n", fullSize, targetSize,leftOver);
 
-	// Dispatch Work to threads
+	//Create Work for threads
 	#if 0
 	Keep track of two pointers per partition.
 	One for the start and one for the end. 
@@ -658,9 +708,16 @@ ReadSet(const char *n, int column, const char *delim)
 	Read forward char by char looking for a \n.
 	Per char increment the partitions end ptr by 1.
 	#endif
-	//Must be an array to satisfy pread
-	char lookAhead[] = {'X','\0'};
-
+	size_t targetSize = fullSize / THREAD_COUNT;
+	size_t leftOver = fullSize % THREAD_COUNT;
+	size_t partitionStart = 0;
+	printf("TotalSize = %ld , TargetSize = %ld , leftOver = %ld \n", fullSize, targetSize,leftOver);
+	
+	char lookAhead[] = {'X','\0'}; //Must be an array to satisfy pread
+	struct partition * allPartitions[THREAD_COUNT];
+	struct dataset * allLocalSets[THREAD_COUNT];
+	
+	//Create Partitions
 	for (size_t i = 0; i < THREAD_COUNT; i++)
 	{	
 		size_t partitionEnd = partitionStart + targetSize -1;
@@ -676,9 +733,10 @@ ReadSet(const char *n, int column, const char *delim)
 			pread(fileDescriptor,lookAhead,1,partitionEnd);
 		}
 		///printf(":OutLoop:Look ahead char = [%s]  \n",lookAhead);
-
+		struct dataset * localSet = NewSet();
+		allLocalSets[i] = localSet;
 		struct partition * currentPartition =  
-			NewPartition(partitionStart, partitionEnd,fileDescriptor,delim,s,column,i);
+			NewPartition(partitionStart, partitionEnd,fileDescriptor,delim,allLocalSets[i],column,i);
 
 		printf("Start = %ld, End = %ld  \n",currentPartition->start, currentPartition->end);
 		allPartitions[i] = currentPartition;
@@ -716,6 +774,7 @@ ReadSet(const char *n, int column, const char *delim)
 			perror("ERROR joining threads");
 			exit(EXIT_FAILURE);
 		}
+		MergeDatasets(s,allLocalSets[i]);
 	}
 	
 	int ret = close(fileDescriptor);
