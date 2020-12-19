@@ -24,7 +24,6 @@ def runInputDeck():
             elapsed = end - start
             print(f"Time elapsed for {iFile} = {elapsed}")
             results[path][int(x)] = elapsed
-    
 
 def sortAndPlot():
     global results
