@@ -611,9 +611,14 @@ ReadPartition(void * part)
 				//Overflow string building to concat across the current and previous buffers
 				if(overFlowFlag == true)
 				{
-					//memset(finalString,'\0', BUFFER_SIZE);
+					//printf("OVFL String Building\n");
+					//printf("Overflow Index = %d, StartIndex = %d \n",overFlowIndex,startIndex);
 					*finalString = '\0';
-					strcat(finalString, overFlowBuffer + overFlowIndex);
+					//printf("OVFL String = %s \n",overFlowBuffer + overFlowIndex);
+					//printf("NEW String = %s \n", buffer + startIndex);
+					memset(finalString,'\0', BUFFER_SIZE);
+					strncat(finalString, overFlowBuffer + overFlowIndex, strlen(overFlowBuffer + overFlowIndex));
+					//printf("Final String after OVFL Concat = %s \n", finalString);
 					strcat(finalString,buffer + startIndex);
 					overFlowFlag = false;
 					intCount++;
@@ -659,6 +664,7 @@ ReadPartition(void * part)
 		{
 			overFlowFlag = true;
 			overFlowIndex = startIndex;
+			memset(overFlowBuffer,'\0', BUFFER_SIZE);
 			memcpy(overFlowBuffer,buffer,BUFFER_SIZE);
 		}
 	} // Close While Loop
