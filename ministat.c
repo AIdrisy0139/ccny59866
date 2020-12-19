@@ -27,7 +27,9 @@
 #define NSTUDENT 100
 #define NCONF 6
 #define BUFFER_SIZE BUFSIZ // Amount of characters in the buffer 
-#define THREAD_COUNT 3	// Number of threads to read each file
+#define THREAD_COUNT 4	// Number of threads to read each file
+pthread_mutex_t mutex_ds = PTHREAD_MUTEX_INITIALIZER;
+
 double const studentpct[] = { 80, 90, 95, 98, 99, 99.5 };
 double student [NSTUDENT + 1][NCONF] = {
 /* inf */	{	1.282,	1.645,	1.960,	2.326,	2.576,	3.090  },
@@ -460,10 +462,11 @@ struct partition
 	const char *delim;
 	int col;
 	struct dataset * dataSet;
+	int thread;
 };
 
 struct partition *
-NewPartition(size_t s, size_t e, int fd, const char *d, struct dataset * ds, int c)
+NewPartition(size_t s, size_t e, int fd, const char *d, struct dataset * ds, int c,int threadNum)
 {
 	struct partition * p;
 
@@ -475,6 +478,7 @@ NewPartition(size_t s, size_t e, int fd, const char *d, struct dataset * ds, int
 	p->delim = d;
 	p->col = c;
 	p->dataSet = ds;
+	p->thread = threadNum;
 	return p;
 }
 
@@ -490,14 +494,14 @@ ReadPartition(void * part)
 	const char * delim = partition->delim;
 	int column = partition->col;
 	struct dataset * s = partition->dataSet;
-	
+	int threadNumber = partition->thread;
+	printf("Thread Number = %d \n",threadNumber);
 
 	char *p, *t;
 
 	size_t totalBytesRead = 0;
 	off_t offset = partitionStart;
 
-	
 	char buffer[BUFFER_SIZE];
 	buffer[BUFFER_SIZE-1] = '\0';
 
@@ -512,10 +516,9 @@ ReadPartition(void * part)
 	int line = 0;
 	double d;
 
-	int bytesRead =0;
+	int bytesRead = 0;
 	int intCount = 0;
 	int overFlowIndex = 0;
-
 
 	#if 0
 		Read BUFFER_SIZE many bytes from the file
@@ -575,6 +578,7 @@ ReadPartition(void * part)
 
 				startIndex = index + 1;	
 				//Appending the parsed string to the data struct
+				printf("%s\n", finalString);
 				z = strlen(finalString);
 				for (z = 1, t = strtok(finalString, delim);
 					t != NULL && *t != '#';
@@ -589,7 +593,11 @@ ReadPartition(void * part)
 				if (p != NULL && *p != '\0')
 					err(2, "Invalid data on line %d in\n", line);
 				if (*finalString != '\0')
+				{
+					pthread_mutex_lock(&mutex_ds);
 					AddPoint(s, d);
+					pthread_mutex_unlock(&mutex_ds);
+				}
 			}
 			index++;	
 		} //Close For loop
@@ -612,7 +620,6 @@ ReadSet(const char *n, int column, const char *delim)
 
 	struct dataset *s;
 
-
 	if (n == NULL) {
 		// No I/O file specified so set up opening FD
 		fileDescriptor = STDIN_FILENO;
@@ -630,8 +637,6 @@ ReadSet(const char *n, int column, const char *delim)
 
 	s = NewSet();
 	s->name = strdup(n);
-
-
 
 	// Get Partition Size
 	struct stat st;
@@ -662,20 +667,20 @@ ReadSet(const char *n, int column, const char *delim)
 
 
 		pread(fileDescriptor,lookAhead,1, partitionEnd);
-		printf(":PreLoop %ld :Look ahead char = [%s], partitionEnd = [%ld]  \n",
-					i,lookAhead, partitionEnd);
+		//printf(":PreLoop %ld :Look ahead char = [%s], partitionEnd = [%ld]  \n",
+		//			i,lookAhead, partitionEnd);
 		while(lookAhead[0] != '\n')
 		{
-			printf(":InLoop:Look ahead char = [%s]  \n",lookAhead);
+			//printf(":InLoop:Look ahead char = [%s]  \n",lookAhead);
 			partitionEnd++;
 			pread(fileDescriptor,lookAhead,1,partitionEnd);
 		}
-		//printf(":OutLoop:Look ahead char = [%s]  \n",lookAhead);
+		///printf(":OutLoop:Look ahead char = [%s]  \n",lookAhead);
 
 		struct partition * currentPartition =  
-			NewPartition(partitionStart, partitionEnd,fileDescriptor,delim,s,column);
+			NewPartition(partitionStart, partitionEnd,fileDescriptor,delim,s,column,i);
 
-		//printf("Start = %ld, End = %ld  \n",currentPartition->start, currentPartition->end);
+		printf("Start = %ld, End = %ld  \n",currentPartition->start, currentPartition->end);
 		allPartitions[i] = currentPartition;
 		partitionStart = partitionEnd + 1;
 	}	
@@ -693,17 +698,17 @@ ReadSet(const char *n, int column, const char *delim)
 		printf("Index = %ld, Partition Start = %ld, Partition End = %ld \n", 
 				i, current->start, current->end);
 
-		/*
+		
 		if(pthread_create(&threads[i],NULL, ReadPartition,current) !=0)
 		{
 			perror("ERROR creating threads");
 			exit(EXIT_FAILURE);
-		}*/
-		ReadPartition(current);
+		}
+		//ReadPartition(current);
 	}
-
-	/*
+	
 	// Join executed threads
+	
 	for (size_t i = 0; i < THREAD_COUNT; i++)
 	{
 		if(pthread_join(threads[i],NULL)!=0)
@@ -711,8 +716,7 @@ ReadSet(const char *n, int column, const char *delim)
 			perror("ERROR joining threads");
 			exit(EXIT_FAILURE);
 		}
-	}*/
-	
+	}
 	
 	int ret = close(fileDescriptor);
 	if( ret == -1)
