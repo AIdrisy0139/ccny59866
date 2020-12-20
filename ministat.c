@@ -1068,7 +1068,7 @@ main(int argc, char **argv)
 	}
 
 	ci = -1;
-	while ((c = getopt(argc, argv, "C:c:d:snqw:")) != -1)
+	while ((c = getopt(argc, argv, "C:c:d:snqwv:")) != -1)
 		switch (c) {
 		case 'C':
 			column = strtol(optarg, &p, 10);
@@ -1093,15 +1093,19 @@ main(int argc, char **argv)
 			delim = optarg;
 			break;
 		case 'n':
+			printf("Case: flag = n \n");
 			flag_n = 1;
 			break;
 		case 'q':
+			printf("Case: flag = q \n");
 			flag_q = 1;
 			break;
 		case 's':
+			printf("Case: flag = s \n");
 			flag_s = 1;
 			break;
 		case 'v':
+			printf("Case: flag = v \n");
 			flag_t = 1;//timing flag v stands for verbose.
 			break;
 		case 'w':
@@ -1112,9 +1116,11 @@ main(int argc, char **argv)
 				usage("Unable to move beyond left margin.");
 			break;
 		default:
+			printf(" c = %c \n", c);
 			usage("Unknown option");
 			break;
 		}
+	printf("Left the switch\n");
 	if (ci == -1)
 		ci = 2;
 	argc -= optind;
