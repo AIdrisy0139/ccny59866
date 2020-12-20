@@ -1,4 +1,4 @@
- /*
+/*
  * ----------------------------------------------------------------------------
  * "THE BEER-WARE LICENSE" (Revision 42):
  * <phk@FreeBSD.ORG> wrote this file.  As long as you retain this notice you
@@ -31,6 +31,35 @@
 #define BUFFER_SIZE BUFSIZ // Amount of characters in the buffer 
 #define THREAD_COUNT 4	// Number of threads to read each file
 
+#define NSTUDENT 100
+#define NCONF 6
+
+static int
+dbl_cmp(const void *a, const void *b)
+{
+	const double *aa = a;
+	const double *bb = b;
+
+	if (*aa < *bb)
+		return (-1);
+	else if (*aa > *bb)
+		return (1);
+	else
+		return (0);
+}
+#define AN_QSORT_SUFFIX doubles
+#define AN_QSORT_TYPE double
+#define AN_QSORT_CMP dbl_cmp
+#include "an_qsort.inc"
+
+struct args{
+	char* fd;
+	const char* delim;
+	int column;
+	int i;
+	int flag_t;
+};
+struct dataset *datas[7];
 double const studentpct[] = { 80, 90, 95, 98, 99, 99.5 };
 double student [NSTUDENT + 1][NCONF] = {
 /* inf */	{	1.282,	1.645,	1.960,	2.326,	2.576,	3.090  },
@@ -161,14 +190,9 @@ NewSet(void)
 static void
 AddPoint(struct dataset *ds, double a)
 {
-	double *dp;
-
 	if (ds->n >= ds->lpoints) {
-		dp = ds->points;
 		ds->lpoints *= 4;
-		ds->points = calloc(sizeof *ds->points, ds->lpoints);
-		memcpy(ds->points, dp, sizeof *dp * ds->n);
-		free(dp);
+		ds->points = realloc(ds->points, (sizeof *ds->points) * ds->lpoints);
 	}
 	ds->points[ds->n++] = a;
 	ds->sy += a;
@@ -178,7 +202,6 @@ AddPoint(struct dataset *ds, double a)
 /*
 	Pre-Condition: src and dest are valid ptrs to dataset structs
 	Post-Condition: dest's values reflect having added the points in src to it
-
 	Merge src into dest
 */
 static void
@@ -482,20 +505,6 @@ DumpPlot(void)
 		putchar('-');
 	putchar('+');
 	putchar('\n');
-}
-
-static int
-dbl_cmp(const void *a, const void *b)
-{
-	const double *aa = a;
-	const double *bb = b;
-
-	if (*aa < *bb)
-		return (-1);
-	else if (*aa > *bb)
-		return (1);
-	else
-		return (0);
 }
 
 struct partition
@@ -1011,10 +1020,16 @@ ReadSet(const char *n, int column, const char *delim, int t)
 		    "Dataset %s must contain at least 3 data points\n", n);
 		exit (2);
 	}
-	qsort(s->points, s->n, sizeof *s->points, dbl_cmp);
+	an_qsort_doubles(s->points,s->n);
 	return (s);
 }
-
+void *readset_t(void *var) 
+{
+	struct args *arg = (struct args *)malloc(sizeof(struct args));
+	arg = (struct args*) var;
+	datas[arg->i] = ReadSet(arg->fd,arg->column,arg->delim,arg->flag_t);
+    return NULL; 
+}
 static void
 usage(char const *whine)
 {
@@ -1043,7 +1058,6 @@ usage(char const *whine)
 int
 main(int argc, char **argv)
 {
-	struct dataset *ds[7];
 	int nds;
 	double a;
 	const char *delim = " \t";
@@ -1128,7 +1142,7 @@ main(int argc, char **argv)
 
 	if (argc == 0) 
 	{	
-		ds[0] = ReadSet("-", column, delim, flag_t);
+		datas[0] = ReadSet("-", column, delim, flag_t);
 		nds = 1;
 	} 
 	else 
@@ -1136,29 +1150,38 @@ main(int argc, char **argv)
 		if (argc > (MAX_DS - 1))
 			usage("Too many datasets.");
 		nds = argc;
-		for (i = 0; i < nds; i++)
-		{
-			ds[i] = ReadSet(argv[i], column, delim, flag_t);
+		pthread_t *threads = malloc(sizeof(pthread_t)*(nds));
+		for (i = 0; i < nds; i++){
+			struct args *arguments = (struct args *)malloc(sizeof(struct args));
+			arguments->fd = argv[i];
+			arguments->column = column;
+			arguments->i = i;
+			arguments->flag_t = flag_t;
+			arguments->delim = delim;
+			pthread_create(&threads[i],NULL,readset_t,(void*)arguments);
+		}
+		for (i = 0; i < nds; i++){
+			pthread_join(threads[i],NULL);
 		}
 	}
 
 	for (i = 0; i < nds; i++) 
-		printf("%c %s\n", symbol[i+1], ds[i]->name);
+		printf("%c %s\n", symbol[i+1], datas[i]->name);
 
 	if (!flag_n && !flag_q) {
 		SetupPlot(termwidth, flag_s, nds);
 		for (i = 0; i < nds; i++)
-			DimPlot(ds[i]);
+			DimPlot(datas[i]);
 		for (i = 0; i < nds; i++)
-			PlotSet(ds[i], i + 1);
+			PlotSet(datas[i], i + 1);
 		DumpPlot();
 	}
 	VitalsHead();
-	Vitals(ds[0], 1);
+	Vitals(datas[0], 1);
 	for (i = 1; i < nds; i++) {
-		Vitals(ds[i], i + 1);
+		Vitals(datas[i], i + 1);
 		if (!flag_n)
-			Relative(ds[i], ds[0], ci);
+			Relative(datas[i], datas[0], ci);
 	}
 	exit(0);
 }
