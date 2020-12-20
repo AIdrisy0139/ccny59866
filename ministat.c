@@ -1,4 +1,4 @@
-/*
+ /*
  * ----------------------------------------------------------------------------
  * "THE BEER-WARE LICENSE" (Revision 42):
  * <phk@FreeBSD.ORG> wrote this file.  As long as you retain this notice you
@@ -23,6 +23,8 @@
 #include <sys/stat.h>
 #include "queue.h"
 #include <pthread.h>
+
+#include <time.h>
 
 #define NSTUDENT 100
 #define NCONF 6
@@ -505,6 +507,8 @@ struct partition
 	int col;
 	struct dataset * dataSet;
 	int thread;
+	double timeTok;
+	double timeTod;
 };
 
 struct partition *
@@ -521,6 +525,8 @@ NewPartition(size_t s, size_t e, int fd, const char *d, struct dataset * ds, int
 	p->col = c;
 	p->dataSet = ds;
 	p->thread = threadNum;
+	p->timeTok = 0;
+	p->timeTod = 0;
 	return p;
 }
 
@@ -528,6 +534,177 @@ NewPartition(size_t s, size_t e, int fd, const char *d, struct dataset * ds, int
 	Pre-Condition: Part ptr to a valid partition struct of a file
 	Post-Condition: A new dataset is created that holds all the values for this partition
 */
+void  *
+ReadPartitionTimed(void * part)
+{
+	// Unpack partition struct
+	struct partition * partition = part;//(struct partition *) partition;
+	int fd = partition->fd;
+	size_t partitionStart = partition->start;
+	size_t partitionEnd = partition->end;
+	int partitionSize = partitionEnd - partitionStart +1; 
+	const char * delim = partition->delim;
+	int column = partition->col;
+	struct dataset * localSet = partition->dataSet;
+	int threadNumber = partition->thread;
+	//printf("Thread Number = %d \n",threadNumber);
+
+	//Thread local dataset setup
+	char str[2];
+	sprintf(str, "%d", threadNumber);
+	localSet->name = str;
+	//printf("LocalSet Name = %s\n",localSet->name);
+	char *p, *t, *buf;
+
+	size_t totalBytesRead = 0;
+	off_t offset = partitionStart;
+
+	char buffer[BUFFER_SIZE];
+	buffer[BUFFER_SIZE-1] = '\0';
+
+	char overFlowBuffer[BUFFER_SIZE];
+	overFlowBuffer[BUFFER_SIZE-1] = '\0';
+	bool overFlowFlag = false;
+
+	char finalString[BUFFER_SIZE];
+	finalString[BUFFER_SIZE-1] = '\0';
+
+	int z;
+	int line = 0;
+	double d;
+
+	int bytesRead = 0;
+	int intCount = 0;
+	int overFlowIndex = 0;
+
+
+	
+
+
+
+	#if 0
+		Read BUFFER_SIZE many bytes from the file
+		Keep track of starting location = start
+		Iterate through the buffer and file the new lines \m
+			Replace the \n  with a \0 to make it a string
+			Pass the substring from buffer[start:[\0]] to the processing code
+		If at end of BUFFER and buffer[bytesRead-1] is not a \n then overflow exists
+			Copy Contents into an overflow buffer
+			Keep track of subString start in the overflow buffer
+	#endif
+
+	while(totalBytesRead < partitionSize)
+	{
+		//Need this because partitions dont have EOF termination, and can have multiple \ns in them
+		if(BUFFER_SIZE > partitionSize - totalBytesRead)
+			bytesRead = pread(fd, &buffer, partitionSize - totalBytesRead, offset);
+		else
+			bytesRead = pread(fd, &buffer, BUFFER_SIZE, offset);
+		
+		//printf("OffSet = %ld  bytesRead = %d \n", offset, bytesRead);
+		totalBytesRead += bytesRead;
+		offset += bytesRead;
+		
+		
+		if(bytesRead == 0)
+			break;
+
+		int startIndex = 0;
+
+
+
+
+		clock_t start_tok, end_tok;
+     		double cpu_time_used_tok = 0;
+		clock_t start_tod, end_tod;
+     		double cpu_time_used_tod = 0;
+
+
+		int index = 0; //Tracks Index ptr is at. Makes some arithmetic easier
+		for(char *ptr = buffer; *ptr != '\0'; ++ptr)
+		{
+			if(*ptr == '\n')
+			{
+				*ptr = '\0';
+				line++;
+
+				//Overflow string building to concat across the current and previous buffers
+				if(overFlowFlag == true)
+				{
+					//printf("OVFL String Building\n");
+					//printf("Overflow Index = %d, StartIndex = %d \n",overFlowIndex,startIndex);
+					*finalString = '\0';
+					//printf("OVFL String = %s \n",overFlowBuffer + overFlowIndex);
+					//printf("NEW String = %s \n", buffer + startIndex);
+					memset(finalString,'\0', BUFFER_SIZE);
+					strncat(finalString, overFlowBuffer + overFlowIndex, strlen(overFlowBuffer + overFlowIndex));
+					//printf("Final String after OVFL Concat = %s \n", finalString);
+					strcat(finalString,buffer + startIndex);
+					overFlowFlag = false;
+					intCount++;
+				}
+				else
+				{
+					//No overflow
+					*finalString = '\0';
+					memset(finalString,'\0', BUFFER_SIZE);
+					strcat(finalString,buffer + startIndex);
+					intCount++;
+				}
+
+				startIndex = index + 1;
+
+				buf = finalString; // needed for strsep to work
+
+				//Appending the parsed string to the data struct
+				//printf("Line : %d = %s\n", line, finalString);
+				
+				z = strlen(finalString);
+				start_tok = clock();
+				for (z = 1, t = strsep(&buf, delim);
+					t != NULL && *t != '#';
+					z++, t = strsep(&buf, delim)) {
+					if (z == column)
+						break;
+				}
+				end_tok = clock();
+				cpu_time_used_tok += ((double)(end_tok - start_tok)) / CLOCKS_PER_SEC;
+				if (t == NULL || *t == '#')
+					continue;
+
+		
+
+				start_tod = clock();
+				d = strtod_fast(t, &p);
+				end_tod = clock();
+
+				cpu_time_used_tod += ((double)(end_tod - start_tod)) / CLOCKS_PER_SEC;
+				if (p != NULL && *p != '\0')
+					err(2, "Invalid data on line %d in\n", line);
+				if (*finalString != '\0')
+				{
+					AddPoint(localSet, d);
+				}
+			}
+			index++;	
+		} //Close For loop
+
+
+
+		partition->timeTok = cpu_time_used_tok;
+		partition->timeTod = cpu_time_used_tod;
+		//Overflow Detection when the buffer splits an integer
+		//if(buffer[bytesRead-1] != '\n')
+		if(*(buffer +bytesRead -1) != '\n')
+		{
+			overFlowFlag = true;
+			overFlowIndex = startIndex;
+			memset(overFlowBuffer,'\0', BUFFER_SIZE);
+			memcpy(overFlowBuffer,buffer,BUFFER_SIZE);
+		}
+	} // Close While Loop
+	return NULL;
+}
 void  *
 ReadPartition(void * part)
 {
@@ -570,6 +747,11 @@ ReadPartition(void * part)
 	int bytesRead = 0;
 	int intCount = 0;
 	int overFlowIndex = 0;
+
+
+	
+
+
 
 	#if 0
 		Read BUFFER_SIZE many bytes from the file
@@ -704,6 +886,9 @@ ReadSet(const char *n, int column, const char *delim)
 	size_t fullSize = st.st_size;
 
 
+	clock_t start_read, end_read;
+	double cpu_time_used_read;
+
 
 	//Create Work for threads
 	#if 0
@@ -748,6 +933,7 @@ ReadSet(const char *n, int column, const char *delim)
 		partitionStart = partitionEnd + 1;
 	}	
 
+
 	//Create and Execute Threads
 	pthread_t * threads = malloc(sizeof(pthread_t) * THREAD_COUNT);
 	if (threads == NULL) {
@@ -755,13 +941,16 @@ ReadSet(const char *n, int column, const char *delim)
 		exit(EXIT_FAILURE);
 	}
 
+	start_read = clock();
+
+
 	for (size_t i = 0; i < THREAD_COUNT; i++)
 	{
 		struct partition * current = allPartitions[i];
 		//printf("Index = %ld, Partition Start = %ld, Partition End = %ld \n", 
 		//		i, current->start, current->end);
 
-		
+
 		if(pthread_create(&threads[i],NULL, ReadPartition,current) !=0)
 		{
 			perror("ERROR creating threads");
@@ -781,7 +970,25 @@ ReadSet(const char *n, int column, const char *delim)
 		}
 		MergeDatasets(s,allLocalSets[i]);
 	}
-	
+
+	end_read = clock();
+	cpu_time_used_read = ((double)(end_read - start_read)) / CLOCKS_PER_SEC;
+	printf("Time taken to read entire file: %f   :\n\n", cpu_time_used_read);
+
+
+	int indexx = 0;
+	double tokSum = 0;
+	double todSum = 0;
+	for(indexx = 0; indexx< sizeof(allPartitions); indexx++){
+//		tokSum += allPartitions[indexx]->timeTok;
+//		todSum += allPartitions[indexx]->timeTod;
+	}
+
+//	tokSum = tokSum/indexx;
+//	todSum = todSum/indexx;
+
+//	printf("tokSum = %f, \n\ntodSum = %f: \n\n", tokSum, todSum);
+
 	int ret = close(fileDescriptor);
 	if( ret == -1)
 	{
