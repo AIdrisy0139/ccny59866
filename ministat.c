@@ -878,7 +878,6 @@ ReadSet(const char *n, int column, const char *delim, int t)
 		err(1, "Cannot open %s", n);
 
 	s = NewSet();
-	printf("Readset: n = %s \n",n);
 	s->name = strdup(n);
 
 	// Get Partition Size
@@ -990,15 +989,17 @@ ReadSet(const char *n, int column, const char *delim, int t)
 
 	end_read = clock();
 	cpu_time_used_read = ((double)(end_read - start_read)) / CLOCKS_PER_SEC;
-	printf("Time taken to read entire file: %f s  \n", cpu_time_used_read);
-	printf("Total CPU Time spent tokenizing  = %f s\n",tokSum);
-	printf("Total CPU Time spent executing string to double conversions todSum = %f s\n", todSum);
+	if(t== 1)
+	{
+		printf("Time taken to read entire file: %f s  \n", cpu_time_used_read);
+		printf("Total CPU Time spent tokenizing  = %f s\n",tokSum);
+		printf("Total CPU Time spent executing string to double conversions todSum = %f s\n", todSum);
 
-	tokSum = tokSum/THREAD_COUNT;
-	todSum = todSum/THREAD_COUNT;
-	printf("Average CPU Time per Thread spent tokenizing  = %f s\n",tokSum);
-	printf("Average CPU Time per Thread executing string to double conversions todSum = %f s\n", todSum);
-
+		tokSum = tokSum/THREAD_COUNT;
+		todSum = todSum/THREAD_COUNT;
+		printf("Average CPU Time per Thread spent tokenizing  = %f s\n",tokSum);
+		printf("Average CPU Time per Thread executing string to double conversions todSum = %f s\n", todSum);
+	}
 	int ret = close(fileDescriptor);
 	if( ret == -1)
 	{
