@@ -27,13 +27,21 @@ About 50% of the samples taken by perf are  in the sorting functions. The rest a
 	- The core algorithim I implemented may be incorrect leading to excesive computation.
 	- Using indexes has too much overhead. Solved by swapping to ptr arithmetic where possible.
 - Solution: Dont use it?
-<img src="micro_vs_stock.png">
-- String tokenization
-strtok is not is fast nor thread safe. Swap it out and use strsep instead or use memchr.
-- String to double conversion.
-Replace the standard C library strtod function with an open-source alternative.
-- qsort 
-Replace the standard C library qsort with a faster inline sorting algorthim. https://github.com/appnexus/acf/blob/master/common/an_qsort.inc
+<img src="/images/micro_vs_stock.png">
+
+#### Ideal Buffer Size Discovery
+- Objective: Find the most optimial size for raw I/O. By default this is BUFFSIZ, defiend as 8192 on my machine. This is a machine dependant directive.
+<img src="images/readBufferSizeVs.png">
+Keeping the parallel file parsing thread count fixed at four, the ideal buffer size is 4096 bytes.
+
+
+
+### String tokenization
+- Objective: strtok is not is fast nor thread safe. Swap it out and use strsep instead or use memchr.
+### String to double conversion.
+- Objective: Replace the standard C library strtod function with an open-source alternative.
+### Faster Sorting
+- Objective: Replace the standard C library qsort with a faster inline sorting algorthim. https://github.com/appnexus/acf/blob/master/common/an_qsort.inc
 
 ## Multi Threading Schema
 ### Parallel File Parsing
