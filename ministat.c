@@ -505,7 +505,6 @@ struct partition
 	int col;
 	struct dataset * dataSet;
 	int thread;
-	int timeElapse = 0;
 };
 
 struct partition *
