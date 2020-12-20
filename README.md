@@ -34,8 +34,6 @@ About 50% of the samples taken by perf are  in the sorting functions. The rest a
 <img src="images/readBufferSizeVs.png">
 Keeping the parallel file parsing thread count fixed at four, the ideal buffer size is 4096 bytes.
 
-
-
 ### String tokenization
 - Objective: strtok is not is fast nor thread safe. Swap it out and use strsep instead or use memchr.
 ### String to double conversion.
@@ -54,17 +52,28 @@ Keeping the parallel file parsing thread count fixed at four, the ideal buffer s
 	- __This shows performance gains.__
 
 <img src="images/parallel_vs_stock.png">
-
 This graph shows interesting behavior, 6 threads is higher than the baseline `ministat` edition. Two and four threads almost equaly performant as the baseline. Eight threads shows a clear performance gain on large file sizes.
 
 <img src="images/parallel_vs_micro_vs_stock.png">
-
 Here the micro optimimzed ministat is thrown into the mix. It behaves as expected with previous analysis, it gets worse than a serialized `ministat` as the file size gets bigger.
 
+### Parallel Sorting
+- Objective: Have each file be processedi n parallel. This will parallelize the serial overhead seen if Parallel File Parsing was done alone.
+- Requires: A struct to pass parameters. Other than that its minimal changes due to each file having its own dataset.
+
+<img src="images/pSort.png">
+As seen the parallelized version (blue) works leagues beetter than the original serialized ministat(orange). Also the parallelized version has an almost constant execution time regardless of file size. 
+
+<img src="images/pSortExt.png">
+
+The green line is a version of ministat that __only__ has parallel file parsing, and no parallel sorting. As seen the gains are massive. 
 
 ---
 
 # Pre-Existing README
+
+## Original Repo: https://github.com/thorduri/ministat
+
 ## ministat
 A small tool to do the statistics legwork on benchmarks etc.
 
