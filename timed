@@ -1,0 +1,7 @@
+Readset: n = inputFiles/524288 
+Time taken to read entire file: 2.734375 s  
+tokSum = 0.000000 s
+todSum = 0.000000 s
+x inputFiles/524288
+    N           Min           Max        Median           Avg        Stddev
+x 524288          4169  4.294963e+09 2.1453656e+09 2.1466436e+09 1.2404674e+09

@@ -969,7 +969,10 @@ ReadSet(const char *n, int column, const char *delim, int t)
 	}
 	
 
-	// Join executed threads
+	// Join executed threads and accumulate metrics
+
+	double tokSum = 0;
+	double todSum = 0;
 	for (size_t i = 0; i < THREAD_COUNT; i++)
 	{
 		if(pthread_join(threads[i],NULL)!=0)
@@ -978,26 +981,24 @@ ReadSet(const char *n, int column, const char *delim, int t)
 			exit(EXIT_FAILURE);
 		}
 		MergeDatasets(s,allLocalSets[i]);
+		if(t == 1)
+		{
+			tokSum += allPartitions[i]->timeTok;
+			todSum += allPartitions[i]->timeTod;
+		}
 	}
 
 	end_read = clock();
 	cpu_time_used_read = ((double)(end_read - start_read)) / CLOCKS_PER_SEC;
+	printf("Time taken to read entire file: %f s  \n", cpu_time_used_read);
+	printf("Total CPU Time spent tokenizing  = %f s\n",tokSum);
+	printf("Total CPU Time spent executing string to double conversions todSum = %f s\n", todSum);
 
-	int indexx = 0;
-	double tokSum = 0;
-	double todSum = 0;
-	if(t == 1){
-		for(indexx = 0; indexx< THREAD_COUNT; indexx++){
-			tokSum += allPartitions[indexx]->timeTok;
-			todSum += allPartitions[indexx]->timeTod;
-		}
+	tokSum = tokSum/THREAD_COUNT;
+	todSum = todSum/THREAD_COUNT;
+	printf("Average CPU Time per Thread spent tokenizing  = %f s\n",tokSum);
+	printf("Average CPU Time per Thread executing string to double conversions todSum = %f s\n", todSum);
 
-		tokSum = tokSum/indexx;
-		todSum = todSum/indexx;
-
-		printf("Time taken to read entire file: %f s  \n", cpu_time_used_read);
-		printf("tokSum = %f s\ntodSum = %f s\n", tokSum, todSum);
-	}
 	int ret = close(fileDescriptor);
 	if( ret == -1)
 	{
