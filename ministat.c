@@ -878,6 +878,7 @@ ReadSet(const char *n, int column, const char *delim, int t)
 		err(1, "Cannot open %s", n);
 
 	s = NewSet();
+	printf("Readset: n = %s \n",n);
 	s->name = strdup(n);
 
 	// Get Partition Size
@@ -967,14 +968,8 @@ ReadSet(const char *n, int column, const char *delim, int t)
 		}
 	}
 	
+
 	// Join executed threads
-
-
-
-	int indexx = 0;
-	double tokSum = 0;
-	double todSum = 0;
-
 	for (size_t i = 0; i < THREAD_COUNT; i++)
 	{
 		if(pthread_join(threads[i],NULL)!=0)
@@ -988,6 +983,9 @@ ReadSet(const char *n, int column, const char *delim, int t)
 	end_read = clock();
 	cpu_time_used_read = ((double)(end_read - start_read)) / CLOCKS_PER_SEC;
 
+	int indexx = 0;
+	double tokSum = 0;
+	double todSum = 0;
 	if(t == 1){
 		for(indexx = 0; indexx< THREAD_COUNT; indexx++){
 			tokSum += allPartitions[indexx]->timeTok;
@@ -1068,7 +1066,7 @@ main(int argc, char **argv)
 	}
 
 	ci = -1;
-	while ((c = getopt(argc, argv, "C:c:d:snqwv:")) != -1)
+	while ((c = getopt(argc, argv, "C:c:d:snqvw:")) != -1)
 		switch (c) {
 		case 'C':
 			column = strtol(optarg, &p, 10);
@@ -1093,19 +1091,19 @@ main(int argc, char **argv)
 			delim = optarg;
 			break;
 		case 'n':
-			printf("Case: flag = n \n");
+			//printf("Case: flag = n \n");
 			flag_n = 1;
 			break;
 		case 'q':
-			printf("Case: flag = q \n");
+			//printf("Case: flag = q \n");
 			flag_q = 1;
 			break;
 		case 's':
-			printf("Case: flag = s \n");
+			//printf("Case: flag = s \n");
 			flag_s = 1;
 			break;
 		case 'v':
-			printf("Case: flag = v \n");
+			//printf("Case: flag = v \n");
 			flag_t = 1;//timing flag v stands for verbose.
 			break;
 		case 'w':
@@ -1120,21 +1118,25 @@ main(int argc, char **argv)
 			usage("Unknown option");
 			break;
 		}
-	printf("Left the switch\n");
 	if (ci == -1)
 		ci = 2;
 	argc -= optind;
 	argv += optind;
 
-	if (argc == 0) {
+	if (argc == 0) 
+	{	
 		ds[0] = ReadSet("-", column, delim, flag_t);
 		nds = 1;
-	} else {
+	} 
+	else 
+	{
 		if (argc > (MAX_DS - 1))
 			usage("Too many datasets.");
 		nds = argc;
 		for (i = 0; i < nds; i++)
+		{
 			ds[i] = ReadSet(argv[i], column, delim, flag_t);
+		}
 	}
 
 	for (i = 0; i < nds; i++) 
