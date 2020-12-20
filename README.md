@@ -50,7 +50,48 @@ Keeping the parallel file parsing thread count fixed at four, the ideal buffer s
 - Hurdle: Using one `struct dataset` per file is two slow. Using a mutex to protect writing to the dataset marginilzes any gains obtained from parallelizations.
 	- Solution: Have each thread work on their own local `struct dataset`. Create the thread local datasets in the `ReadSet` function and pass it in `partition` to the `ReadPartition` function. When joining the threads call `MergeDataset` which will merge the thread local datasets to the dataset for the file. 
 	- __This shows performance gains.__
+```C
+struct partition
+{
+	int fd;
+	size_t start;
+	size_t end;
+	const char *delim;
+	int col;
+	struct dataset * dataSet;
+	int thread;
+	double timeTok;
+	double timeTod;
+};
 
+```
+The partition used to pass information from from `ReadSet()` into `ReadPartition()`. Stores the values needed for tokenzation as well as the start and end points in the file specified by `fd`. Is also used to hold timing statistics.
+
+```C
+//Create Partitions
+for (size_t i = 0; i < THREAD_COUNT; i++)
+{	
+	size_t partitionEnd = partitionStart + targetSize -1;
+
+	pread(fileDescriptor,lookAhead,1, partitionEnd);
+	while(lookAhead[0] != '\n')
+	{
+		//printf(":InLoop:Look ahead char = [%s]  \n",lookAhead);
+		partitionEnd++;
+		pread(fileDescriptor,lookAhead,1,partitionEnd);
+	}
+	
+	struct dataset * localSet = NewSet();
+	allLocalSets[i] = localSet;
+	struct partition * currentPartition =  
+		NewPartition(partitionStart, partitionEnd,fileDescriptor,delim,allLocalSets[i],column,i);
+
+	allPartitions[i] = currentPartition;
+	partitionStart = partitionEnd + 1;
+}	
+
+```
+Partition creation algorhtim in `ReadSet()`
 <img src="images/parallel_vs_stock.png">
 This graph shows interesting behavior, 6 threads is higher than the baseline `ministat` edition. Two and four threads almost equaly performant as the baseline. Eight threads shows a clear performance gain on large file sizes.
 
@@ -67,6 +108,35 @@ As seen the parallelized version (blue) works leagues beetter than the original 
 <img src="images/pSortExt.png">
 
 The green line is a version of ministat that __only__ has parallel file parsing, and no parallel sorting. As seen the gains are massive. 
+
+```C
+pthread_t *threads = malloc(sizeof(pthread_t)*(nds));
+for (i = 0; i < nds; i++){
+	struct args *arguments = (struct args *)malloc(sizeof(struct args));
+	arguments->fd = argv[i];
+	arguments->column = column;
+	arguments->i = i;
+	arguments->flag_t = flag_t;
+	arguments->delim = delim;
+	pthread_create(&threads[i],NULL,readset_t,(void*)arguments);
+}
+for (i = 0; i < nds; i++){
+	pthread_join(threads[i],NULL);
+}
+```
+Code snippit showing thread creation and joing for prallel calls of ReadSet.
+
+```C
+void *readset_t(void *var) 
+{
+	struct args *arg = (struct args *)malloc(sizeof(struct args));
+	arg = (struct args*) var;
+	datas[arg->i] = ReadSet(arg->fd,arg->column,arg->delim,arg->flag_t);
+    return NULL; 
+}
+```
+The new `void * readset_t` unpacks the args for the `ReadSet` function.
+
 
 ---
 
