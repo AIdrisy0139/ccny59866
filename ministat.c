@@ -505,6 +505,7 @@ struct partition
 	int col;
 	struct dataset * dataSet;
 	int thread;
+	int timeElapse = 0;
 };
 
 struct partition *
@@ -541,6 +542,8 @@ ReadPartition(void * part)
 	int column = partition->col;
 	struct dataset * localSet = partition->dataSet;
 	int threadNumber = partition->thread;
+
+
 	//printf("Thread Number = %d \n",threadNumber);
 
 	//Thread local dataset setup
@@ -645,7 +648,6 @@ ReadPartition(void * part)
 					if (z == column)
 						break;
 				}
-				
 				if (t == NULL || *t == '#')
 					continue;
 
@@ -686,7 +688,7 @@ ReadSet(const char *n, int column, const char *delim)
 		n = STDIN_FILENO;
 	} else if (!strcmp(n, "-")) {
 		fileDescriptor = STDIN_FILENO;
-		n = STDIN_FILENO ;
+		n = STDIN_FILENO;
 	} else {
 		// Open the file specified
 		// n = argv[1:];

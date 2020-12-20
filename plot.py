@@ -8,9 +8,11 @@ results = {}
 def runInputDeck():
     global results
     ministatPaths = ["/home/aidrisy/1_thread","/home/aidrisy/2_thread","/home/aidrisy/4_thread",
-                    "/home/aidrisy/6_thread","/home/aidrisy/8_thread","/home/aidrisy/microOpt",
-                    "/home/aidrisy/ministat"]
+                    "/home/aidrisy/6_thread","/home/aidrisy/8_thread","/home/aidrisy/12_thread",
+                    "/home/aidrisy/16_thread","/home/aidrisy/ministat"]
     inputFilesPath = "~/ccny59866/inputFiles"
+
+    #"/home/aidrisy/microOpt"
         
     files = os.listdir("inputFiles")
     for path in ministatPaths:
@@ -56,13 +58,13 @@ def sortAndPlot():
     print(f"Difs = {diffs}")
 
     plt.figure(figsize=(15,10))
-    plt.title("||-Ministat vs µ-Ministat vs Stock-Ministat")
+    plt.title("||-Ministat vs Stock-Ministat")
     plt.xlabel("Size of file in ints")
     plt.ylabel("Running Time (Secs)")
     for i in range(0,len(plotTimes)):
         plt.plot(keys,plotTimes[i],'x--',label=labels[i])
     plt.legend(loc="upper left")
-    plt.savefig("parallel_vs_micro_vs_stock.png")
+    plt.savefig("parallel_vs_stock.png")
 
 
 def main():

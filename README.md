@@ -1,12 +1,48 @@
-# CCNY 59866
+# CCNY 59866 Senior Design Project
+Fall 2020 Semester
 
-Professor : Samy Al Bahra 
+## Members: 
+	- Arikuzzaman Idrisy
+	- Ersi Nurcellari
+	- Fathima Reeza
+	- Haibin Mai
+
+## Goal: 
+Increase the performance of pre-existing ministat program. The objective was two fold, one, execute micro-optimizations uncovered through framegraph analysis, two, introduce mutli-threading for parallel execution.
+
+## Proposed Micro-Optimizations
+- Reading the file contents.
+Use read / write / open systems calls directly to read larger blocks of data at a time. 
+	- Hurdle: Seems the gain is very minimal and not less than CPU Noise
+	- Solution: Dont use it?
+<img src="micro_vs_stock.png">
+- String tokenization
+strtok is not is fast nor thread safe. Swap it out and use strsep instead or use memchr.
+- String to double conversion.
+Replace the standard C library strtod function with an open-source alternative.
+- qsort 
+Replace the standard C library qsort with a faster inline sorting algorthim. https://github.com/appnexus/acf/blob/master/common/an_qsort.inc
+
+## Multi Threading Schema
+### Parallel File Parsing
+- Objective: For a single file passed to ministat have multiple threads simultaneously read from the file
+- Requires reworking the raw I/O micro-optimization to use pread for thread safety
+	- Solved by manually keeping track of the cursor point
+- Partitoning scheme was a bit counterintuive. Instead of each partion being equal number of bytes, they are set to hold whole integers. This requries looking ahead to find a \n character and adjusting the end and start points of the partitions accodingly
+- Hurdle: Using one `struct dataset` per file is two slow. Using a mutex to protect writing to the dataset marginilzes any gains obtained from parallelizations.
+	- Solution: Have each thread work on their own local `struct dataset`. Create the thread local datasets in the `ReadSet` function and pass it in `partition` to the `ReadPartition` function. When joining the threads call `MergeDataset` which will merge the thread local datasets to the dataset for the file. 
+	- __This shows performance gains.__
+
+<img src="images/parallel_vs_stock.png">
+
+This graph shows interesting behavior, 6 threads is higher than the baseline `ministat` edition. Two and four threads almost equaly performant as the baseline. Eight threads shows a clear performance gain on large file sizes.
+
 
 
 ---
 
-
-# ministat
+# Pre-Existing README
+## ministat
 A small tool to do the statistics legwork on benchmarks etc.
 
 Written by Poul-Henning Kamp, lured into a dark Linux alley and clubbed over the head and hauled away to Github by yours truly.
