@@ -856,7 +856,7 @@ ReadPartition(void * part)
 }
 
 static struct dataset *
-ReadSet(const char *n, int column, const char *delim)
+ReadSet(const char *n, int column, const char *delim, int t)
 {
 	int fileDescriptor;
 
@@ -950,17 +950,31 @@ ReadSet(const char *n, int column, const char *delim)
 		//printf("Index = %ld, Partition Start = %ld, Partition End = %ld \n", 
 		//		i, current->start, current->end);
 
-
-		if(pthread_create(&threads[i],NULL, ReadPartition,current) !=0)
-		{
-			perror("ERROR creating threads");
-			exit(EXIT_FAILURE);
-		}
+		if(t == 1){
+			if(pthread_create(&threads[i],NULL, ReadPartitionTimed,current) !=0)
+			{
+				perror("ERROR creating threads");
+				exit(EXIT_FAILURE);
+			}
 		//ReadPartition(current);
+		}
+		else{
+			if(pthread_create(&threads[i],NULL, ReadPartition,current) !=0)
+			{
+				perror("ERROR creating threads");
+				exit(EXIT_FAILURE);
+			}
+		}
 	}
 	
 	// Join executed threads
-	
+
+
+
+	int indexx = 0;
+	double tokSum = 0;
+	double todSum = 0;
+
 	for (size_t i = 0; i < THREAD_COUNT; i++)
 	{
 		if(pthread_join(threads[i],NULL)!=0)
@@ -973,22 +987,19 @@ ReadSet(const char *n, int column, const char *delim)
 
 	end_read = clock();
 	cpu_time_used_read = ((double)(end_read - start_read)) / CLOCKS_PER_SEC;
-	printf("Time taken to read entire file: %f   :\n\n", cpu_time_used_read);
 
+	if(t == 1){
+		for(indexx = 0; indexx< THREAD_COUNT; indexx++){
+			tokSum += allPartitions[indexx]->timeTok;
+			todSum += allPartitions[indexx]->timeTod;
+		}
 
-	int indexx = 0;
-	double tokSum = 0;
-	double todSum = 0;
-	for(indexx = 0; indexx< sizeof(allPartitions); indexx++){
-		tokSum += allPartitions[indexx]->timeTok;
-		todSum += allPartitions[indexx]->timeTod;
+		tokSum = tokSum/indexx;
+		todSum = todSum/indexx;
+
+		printf("Time taken to read entire file: %f s  \n", cpu_time_used_read);
+		printf("tokSum = %f s\ntodSum = %f s\n", tokSum, todSum);
 	}
-
-	tokSum = tokSum/indexx;
-	todSum = todSum/indexx;
-
-	printf("tokSum = %f, \n\ntodSum = %f: \n\n", tokSum, todSum);
-
 	int ret = close(fileDescriptor);
 	if( ret == -1)
 	{
@@ -1010,7 +1021,7 @@ usage(char const *whine)
 
 	fprintf(stderr, "%s\n", whine);
 	fprintf(stderr,
-	    "Usage: ministat [-C column] [-c confidence] [-d delimiter(s)] [-ns] [-w width] [file [file ...]]\n");
+	    "Usage: ministat [-C column] [-c confidence] [-d delimiter(s)] [-ns] [-w width] [-v verbose] [file [file ...]]\n");
 	fprintf(stderr, "\tconfidence = {");
 	for (i = 0; i < NCONF; i++) {
 		fprintf(stderr, "%s%g%%",
@@ -1024,6 +1035,7 @@ usage(char const *whine)
 	fprintf(stderr, "\t-q : print summary statistics and test only, no graph\n");
 	fprintf(stderr, "\t-s : print avg/median/stddev bars on separate lines\n");
 	fprintf(stderr, "\t-w : width of graph/test output (default 74 or terminal width)\n");
+	fprintf(stderr, "\t-v : verbose timing data\n");
 	exit (2);
 }
 
@@ -1040,6 +1052,9 @@ main(int argc, char **argv)
 	int flag_s = 0;
 	int flag_n = 0;
 	int flag_q = 0;
+
+	int flag_t = 0;
+
 	int termwidth = 74;
 
 	if (isatty(STDOUT_FILENO)) {
@@ -1086,6 +1101,9 @@ main(int argc, char **argv)
 		case 's':
 			flag_s = 1;
 			break;
+		case 'v':
+			flag_t = 1;//timing flag v stands for verbose.
+			break;
 		case 'w':
 			termwidth = strtol(optarg, &p, 10);
 			if (p != NULL && *p != '\0')
@@ -1103,14 +1121,14 @@ main(int argc, char **argv)
 	argv += optind;
 
 	if (argc == 0) {
-		ds[0] = ReadSet("-", column, delim);
+		ds[0] = ReadSet("-", column, delim, flag_t);
 		nds = 1;
 	} else {
 		if (argc > (MAX_DS - 1))
 			usage("Too many datasets.");
 		nds = argc;
 		for (i = 0; i < nds; i++)
-			ds[i] = ReadSet(argv[i], column, delim);
+			ds[i] = ReadSet(argv[i], column, delim, flag_t);
 	}
 
 	for (i = 0; i < nds; i++) 
