@@ -2,19 +2,31 @@
 Fall 2020 Semester
 
 ## Members: 
-	- Arikuzzaman Idrisy
-	- Ersi Nurcellari
-	- Fathima Reeza
-	- Haibin Mai
-
+- Arikuzzaman Idrisy
+- Ersi Nurcellari
+- Fathima Reeza
+- Haibin Mai
+## Usage
+	Extended: 
+		-v : print verbose timing stastics
 ## Goal: 
 Increase the performance of pre-existing ministat program. The objective was two fold, one, execute micro-optimizations uncovered through framegraph analysis, two, introduce mutli-threading for parallel execution.
 
+## Investigation
+Do get a profile of where program spends time `perf` was used in conjunction with a flamegraph generator for visualization. 
+<img src="/images/perf_original.svg">
+
+About 50% of the samples taken by perf are  in the sorting functions. The rest are spent in ReadSet which deals with file I/O, string tokenezation, string to double conversion, and building the dataset structures.
+
+
 ## Proposed Micro-Optimizations
-- Reading the file contents.
-Use read / write / open systems calls directly to read larger blocks of data at a time. 
-	- Hurdle: Seems the gain is very minimal and not less than CPU Noise
-	- Solution: Dont use it?
+### Reading the file contents.
+- ObjectiveUse read / write / open systems calls directly to read larger blocks of data at a time. 
+- Hurdles:
+	- Seems the gain is very minimal and not less than CPU Noise. It also gets worse as the size of the file gets bigger.
+	- The core algorithim I implemented may be incorrect leading to excesive computation.
+	- Using indexes has too much overhead. Solved by swapping to ptr arithmetic where possible.
+- Solution: Dont use it?
 <img src="micro_vs_stock.png">
 - String tokenization
 strtok is not is fast nor thread safe. Swap it out and use strsep instead or use memchr.
@@ -37,6 +49,9 @@ Replace the standard C library qsort with a faster inline sorting algorthim. htt
 
 This graph shows interesting behavior, 6 threads is higher than the baseline `ministat` edition. Two and four threads almost equaly performant as the baseline. Eight threads shows a clear performance gain on large file sizes.
 
+<img src="images/parallel_vs_micro_vs_stock.png">
+
+Here the micro optimimzed ministat is thrown into the mix. It behaves as expected with previous analysis, it gets worse than a serialized `ministat` as the file size gets bigger.
 
 
 ---
