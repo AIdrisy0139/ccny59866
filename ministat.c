@@ -980,14 +980,14 @@ ReadSet(const char *n, int column, const char *delim)
 	double tokSum = 0;
 	double todSum = 0;
 	for(indexx = 0; indexx< sizeof(allPartitions); indexx++){
-//		tokSum += allPartitions[indexx]->timeTok;
-//		todSum += allPartitions[indexx]->timeTod;
+		tokSum += allPartitions[indexx]->timeTok;
+		todSum += allPartitions[indexx]->timeTod;
 	}
 
-//	tokSum = tokSum/indexx;
-//	todSum = todSum/indexx;
+	tokSum = tokSum/indexx;
+	todSum = todSum/indexx;
 
-//	printf("tokSum = %f, \n\ntodSum = %f: \n\n", tokSum, todSum);
+	printf("tokSum = %f, \n\ntodSum = %f: \n\n", tokSum, todSum);
 
 	int ret = close(fileDescriptor);
 	if( ret == -1)
