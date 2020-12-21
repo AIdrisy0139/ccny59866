@@ -910,6 +910,8 @@ ReadPartition(void * part, int flag_INT, const char *n)
 			memcpy(overFlowBuffer,buffer,BUFFER_SIZE);
 		}
 	} // Close While Loop
+	
+	
 	return NULL;
 }
 
@@ -1088,7 +1090,7 @@ void *readset_t(void *var)
 {
 	struct args *arg = (struct args *)malloc(sizeof(struct args));
 	arg = (struct args*) var;
-	datas[arg->i] = ReadSet(arg->fd,arg->column,arg->delim,arg->flag_t,arg->flag_int);
+	datas[arg->i] = ReadSet(arg->fd,arg->column,arg->delim,arg->flag_t,arg->flag_INT);
     return NULL; 
 }
 static void
@@ -1224,7 +1226,7 @@ main(int argc, char **argv)
 			arguments->i = i;
 			arguments->flag_t = flag_t;
 			arguments->delim = delim;
-			arguments->flag_int = flag_INT;
+			arguments->flag_INT = flag_INT;
 			pthread_create(&threads[i],NULL,readset_t,(void*)arguments);
 		}
 		for (i = 0; i < nds; i++){
