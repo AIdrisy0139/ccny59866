@@ -7,6 +7,7 @@ Fall 2020 Semester
 - Fathima Reeza
 - Haibin Mai
 ## Usage
+Run `make clean` then `make`
 	Extended: 
 		-v : print verbose timing stastics
 		-I : Integer only mode
