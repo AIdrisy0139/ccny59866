@@ -1001,6 +1001,7 @@ ReadSet(const char *n, int column, const char *delim, int t)
 	cpu_time_used_read = ((double)(end_read - start_read)) / CLOCKS_PER_SEC;
 	if(t== 1)
 	{
+		printf("\nTiming data for file %s\n", n);
 		printf("Time taken to read entire file: %f s  \n", cpu_time_used_read);
 		printf("Total CPU Time spent tokenizing  = %f s\n",tokSum);
 		printf("Total CPU Time spent executing string to double conversions todSum = %f s\n", todSum);
@@ -1009,6 +1010,7 @@ ReadSet(const char *n, int column, const char *delim, int t)
 		todSum = todSum/THREAD_COUNT;
 		printf("Average CPU Time per Thread spent tokenizing  = %f s\n",tokSum);
 		printf("Average CPU Time per Thread executing string to double conversions todSum = %f s\n", todSum);
+		printf("End of timing data for file %s\n", n);
 	}
 	int ret = close(fileDescriptor);
 	if( ret == -1)
@@ -1151,6 +1153,11 @@ main(int argc, char **argv)
 			usage("Too many datasets.");
 		nds = argc;
 		pthread_t *threads = malloc(sizeof(pthread_t)*(nds));
+
+		clock_t start_read, end_read;
+		double cpu_time_used_read;
+
+		start_read = clock();
 		for (i = 0; i < nds; i++){
 			struct args *arguments = (struct args *)malloc(sizeof(struct args));
 			arguments->fd = argv[i];
@@ -1163,6 +1170,12 @@ main(int argc, char **argv)
 		for (i = 0; i < nds; i++){
 			pthread_join(threads[i],NULL);
 		}
+		end_read = clock();
+
+		cpu_time_used_read = ((double)(end_read - start_read)) / CLOCKS_PER_SEC;
+
+		printf("\n\nTime taken by threads calling ReadSet: %f s  \n", cpu_time_used_read);
+
 	}
 
 	for (i = 0; i < nds; i++) 
