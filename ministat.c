@@ -1030,7 +1030,7 @@ void *readset_t(void *var)
 	struct args *arg = (struct args *)malloc(sizeof(struct args));
 	arg = (struct args*) var;
 	datas[arg->i] = ReadSet(arg->fd,arg->column,arg->delim,arg->flag_t);
-    return NULL; 
+    	return NULL;
 }
 static void
 usage(char const *whine)
