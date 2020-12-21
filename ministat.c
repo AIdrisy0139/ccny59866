@@ -750,7 +750,7 @@ ReadPartition(void * part)
 	int column = partition->col;
 	struct dataset * localSet = partition->dataSet;
 	int threadNumber = partition->thread;
-	int flag_INT = partition->iFlag;
+	int flag_INT = partition->flag_INT;
 	const char *n = partition->name;
 
 
