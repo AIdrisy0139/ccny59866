@@ -524,6 +524,20 @@ DumpPlot(void)
 	putchar('\n');
 }
 
+struct partition
+{
+	int fd;
+	size_t start;
+	size_t end;
+	const char *delim;
+	int col;
+	struct dataset * dataSet;
+	int thread;
+	double timeTok;
+	double timeTod;
+	int flag_INT; 
+	const char *n;
+};
 
 struct partition *
 NewPartition(size_t s, size_t e, int fd, const char *d, struct dataset *ds, int c,
@@ -542,23 +556,10 @@ NewPartition(size_t s, size_t e, int fd, const char *d, struct dataset *ds, int 
 	p->timeTok = 0;
 	p->timeTod = 0;
 	p->flag_INT = flag_INT;
-	p->name = n;
+	p->n = n;
 	return p;
 }
-struct partition
-{
-	int fd;
-	size_t start;
-	size_t end;
-	const char *delim;
-	int col;
-	struct dataset * dataSet;
-	int thread;
-	double timeTok;
-	double timeTod;
-	int flag_INT; 
-	const char *n;
-};
+
 /*
 	Pre-Condition: Part ptr to a valid partition struct of a file
 	Post-Condition: A new dataset is created that holds all the values for this partition
@@ -751,7 +752,7 @@ ReadPartition(void * part)
 	struct dataset * localSet = partition->dataSet;
 	int threadNumber = partition->thread;
 	int flag_INT = partition->flag_INT;
-	const char *n = partition->name;
+	const char *n = partition->n;
 
 
 	//printf("Thread Number = %d \n",threadNumber);
@@ -992,7 +993,7 @@ ReadSet(const char *n, int column, const char *delim, int t, int flag_INT)
 		struct dataset * localSet = NewSet();
 		allLocalSets[i] = localSet;
 		struct partition * currentPartition =  
-			NewPartition(partitionStart, partitionEnd,fileDescriptor,delim,allLocalSets[i],column,i);
+			NewPartition(partitionStart, partitionEnd,fileDescriptor,delim,allLocalSets[i],column,i,flag_INT,n);
 
 		//printf("Start = %ld, End = %ld  \n",currentPartition->start, currentPartition->end);
 		allPartitions[i] = currentPartition;
