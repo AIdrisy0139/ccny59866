@@ -525,6 +525,25 @@ DumpPlot(void)
 }
 
 
+struct partition *
+NewPartition(size_t s, size_t e, int fd, const char *d, struct dataset *ds, int c,
+				int threadNum, int flag_INT, const char *n)
+{
+	struct partition *p;
+	p = malloc(sizeof *p);
+	p->start = s;
+	p->end = e;
+	p->fd = fd;
+	p->delim = d;
+	p->col = c;
+	p->dataSet = ds;
+	p->thread = threadNum;
+	p->timeTok = 0;
+	p->timeTod = 0;
+	p->iFlag = flag_INT;
+	p->name = n;
+	return p;
+}
 struct partition
 {
 	int fd;
@@ -536,26 +555,9 @@ struct partition
 	int thread;
 	double timeTok;
 	double timeTod;
+	int flag_INT; 
+	const char *n;
 };
-
-struct partition *
-NewPartition(size_t s, size_t e, int fd, const char *d, struct dataset * ds, int c,int threadNum)
-{
-	struct partition * p;
-
-	p = malloc(sizeof *p);
-	p->start = s;
-	p->end = e;
-
-	p->fd = fd;
-	p->delim = d;
-	p->col = c;
-	p->dataSet = ds;
-	p->thread = threadNum;
-	p->timeTok = 0;
-	p->timeTod = 0;
-	return p;
-}
 
 /*
 	Pre-Condition: Part ptr to a valid partition struct of a file
@@ -736,7 +738,7 @@ ReadPartitionTimed(void * part)
 	return NULL;
 }
 void  *
-ReadPartition(void * part, int flag_INT, const char *n)
+ReadPartition(void * part)
 {
 	// Unpack partition struct
 	struct partition * partition = part;//(struct partition *) partition;
@@ -748,6 +750,8 @@ ReadPartition(void * part, int flag_INT, const char *n)
 	int column = partition->col;
 	struct dataset * localSet = partition->dataSet;
 	int threadNumber = partition->thread;
+	int flag_INT = partition->iFlag;
+	const char *n = partition->name;
 
 
 	//printf("Thread Number = %d \n",threadNumber);
