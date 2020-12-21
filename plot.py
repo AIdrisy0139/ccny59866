@@ -7,7 +7,7 @@ results = {}
 
 def runInputDeck():
     global results
-    ministatPaths = ["/home/aidrisy/ccny59866","/home/aidrisy/ministat","/home/aidrisy/8192_size"]
+    ministatPaths = ["/home/aidrisy/ccny59866","/home/aidrisy/ministat","/home/aidrisy/old"]
 
 
     inputFilesPath = "~/ccny59866/inputFiles"
@@ -58,13 +58,13 @@ def sortAndPlot():
     print(f"Difs = {diffs}")
 
     plt.figure(figsize=(15,10))
-    plt.title("||-Files + ||-Sorting vs ||-Files vs Stock-Ministat")
+    plt.title("Full µ-Opts AND Full Parallelization vs Stock-Ministat")
     plt.xlabel("Size of file in ints")
     plt.ylabel("Running Time (Secs)")
     for i in range(0,len(plotTimes)):
         plt.plot(keys,plotTimes[i],'x--',label=labels[i])
     plt.legend(loc="upper left")
-    plt.savefig("pSortExt.png")
+    plt.savefig("end.png")
 
 
 def main():

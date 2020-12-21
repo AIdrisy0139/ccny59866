@@ -9,6 +9,7 @@ Fall 2020 Semester
 ## Usage
 	Extended: 
 		-v : print verbose timing stastics
+		-I : Integer only mode
 ## Goal: 
 Increase the performance of pre-existing ministat program. The objective was two fold, one, execute micro-optimizations uncovered through framegraph analysis, two, introduce mutli-threading for parallel execution.
 
@@ -137,7 +138,10 @@ void *readset_t(void *var)
 ```
 The new `void * readset_t` unpacks the args for the `ReadSet` function.
 
+## Integer Mode
+<img src="/images/end.png">
 
+We see that with integer mode in blue we have a performance gain.
 ---
 
 # Pre-Existing README
