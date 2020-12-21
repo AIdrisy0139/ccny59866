@@ -8,7 +8,7 @@
  *
  */
 #include <sys/ioctl.h>
-
+#include "SDProject/strtod-lite.c"
 #include <err.h>
 #include <math.h>
 #include <stdio.h>
@@ -436,6 +436,7 @@ DumpPlot(void)
 	putchar('\n');
 }
 
+/** Double comparator */
 static int
 dbl_cmp(const void *a, const void *b)
 {
@@ -450,12 +451,27 @@ dbl_cmp(const void *a, const void *b)
 		return (0);
 }
 
-static struct dataset *
-ReadSet(const char *n, int column, const char *delim)
+/** Integer Comparator */
+static int
+int_cmp(const void *a, const void *b)
 {
-	int fileDescriptor;
+    const unsigned long long *aa = a;
+    const unsigned long long *bb = b;
 
-	char *p, *t;
+    if (*aa < *bb)
+		return (-1);
+	else if (*aa > *bb)
+		return (1);
+	else
+		return (0);
+}
+
+static struct dataset *
+ReadSet(const char *n, int column, const char *delim, int flag_INT)
+{	
+    int fileDescriptor;
+
+	char *p, *t, *buf;
 
 	char buffer[BUFFER_SIZE];
 	buffer[BUFFER_SIZE-1] = '\0';
@@ -539,19 +555,48 @@ ReadSet(const char *n, int column, const char *delim)
 				}
 
 				startIndex = index + 1;
-				
+
+				buf = finalString; // needed for strsep to work
+
 				//Appending the parsed string to the data struct
 				z = strlen(finalString);
-				for (z = 1, t = strtok(finalString, delim);
+				for (z = 1, t = strsep(&buf, delim);
 					t != NULL && *t != '#';
-					z++, t = strtok(NULL, delim)) {
+					z++, t = strsep(&buf, delim)) {
 					if (z == column)
 						break;
 				}
 				if (t == NULL || *t == '#')
 					continue;
 
-				d = strtod(t, &p);
+				if (flag_INT) {
+                    /* convert string to unsigned long long int (64 bits on both x32 and x64 platforms) */
+                    unsigned long long result = strtoull(t, &p, 10);                   
+
+                    /* check if the number is out of range */
+                    if (errno == ERANGE) {
+                        err(2, "Invalid data on line %d in %s\n", line, n);
+                    }
+
+                    /* check if a floating-point value appears in the INT mode. */
+                    if (p != NULL && *p == '.') {
+                        fprintf(stderr, "Error parsing file, ensure input is only integers or run without -I flag\n");
+                        exit(1);
+                    }                    
+                    
+                    /* cast int to double */
+                    d = (double) result;
+
+                    /* check if loss of precision has occurred  */
+                    if (result != (unsigned long long) d) {
+                        fprintf(stderr, "WARNING: Invalid data on line %d in %s\n: Unable to cast %llu without loss of precision\n", line, n, result);                       
+                    }
+
+                } else {
+                    /* convert string to double */
+                    d = strtod_fast(t, &p);
+                }                
+
 				if (p != NULL && *p != '\0')
 					err(2, "Invalid data on line %d in %s\n", line, n);
 				if (*finalString != '\0')
@@ -583,7 +628,17 @@ ReadSet(const char *n, int column, const char *delim)
 		    "Dataset %s must contain at least 3 data points\n", n);
 		exit (2);
 	}
-	qsort(s->points, s->n, sizeof *s->points, dbl_cmp);
+
+    /* select a comparator function based on value of flag_INT */
+    int (*comparator)(const void *, const void *);
+    if (flag_INT) {
+        comparator = int_cmp; // use integer comparator
+    } else {
+        comparator = dbl_cmp; // use double comparator
+    }	
+    /* Sort the dataset using selected comparator */
+    qsort(s->points, s->n, sizeof *s->points, comparator);
+
 	return (s);
 }
 
@@ -594,7 +649,7 @@ usage(char const *whine)
 
 	fprintf(stderr, "%s\n", whine);
 	fprintf(stderr,
-	    "Usage: ministat [-C column] [-c confidence] [-d delimiter(s)] [-ns] [-w width] [file [file ...]]\n");
+	    "Usage: ministat [-C column] [-c confidence] [-d delimiter(s)] [-nsI] [-w width] [file [file ...]]\n");
 	fprintf(stderr, "\tconfidence = {");
 	for (i = 0; i < NCONF; i++) {
 		fprintf(stderr, "%s%g%%",
@@ -608,6 +663,7 @@ usage(char const *whine)
 	fprintf(stderr, "\t-q : print summary statistics and test only, no graph\n");
 	fprintf(stderr, "\t-s : print avg/median/stddev bars on separate lines\n");
 	fprintf(stderr, "\t-w : width of graph/test output (default 74 or terminal width)\n");
+	fprintf(stderr, "\t-I : integer mode\n");
 	exit (2);
 }
 
@@ -623,7 +679,10 @@ main(int argc, char **argv)
 	int column = 1;
 	int flag_s = 0;
 	int flag_n = 0;
-	int flag_q = 0;
+	int flag_q = 0;	
+	/* This flag_INT variable indicates INT mode*/
+	int flag_INT = 0;
+
 	int termwidth = 74;
 
 	if (isatty(STDOUT_FILENO)) {
@@ -637,7 +696,7 @@ main(int argc, char **argv)
 	}
 
 	ci = -1;
-	while ((c = getopt(argc, argv, "C:c:d:snqw:")) != -1)
+	while ((c = getopt(argc, argv, "C:c:d:snqw:I")) != -1)
 		switch (c) {
 		case 'C':
 			column = strtol(optarg, &p, 10);
@@ -647,7 +706,7 @@ main(int argc, char **argv)
 				usage("Column number should be positive.");
 			break;
 		case 'c':
-			a = strtod(optarg, &p);
+			a = strtod_fast(optarg, &p);
 			if (p != NULL && *p != '\0')
 				usage("Not a floating point number");
 			for (i = 0; i < NCONF; i++)
@@ -677,6 +736,9 @@ main(int argc, char **argv)
 			if (termwidth < 0)
 				usage("Unable to move beyond left margin.");
 			break;
+		case 'I':			
+			flag_INT = 1;
+			break;
 		default:
 			usage("Unknown option");
 			break;
@@ -687,14 +749,14 @@ main(int argc, char **argv)
 	argv += optind;
 
 	if (argc == 0) {
-		ds[0] = ReadSet("-", column, delim);
+		ds[0] = ReadSet("-", column, delim, flag_INT);
 		nds = 1;
 	} else {
 		if (argc > (MAX_DS - 1))
 			usage("Too many datasets.");
 		nds = argc;
 		for (i = 0; i < nds; i++)
-			ds[i] = ReadSet(argv[i], column, delim);
+			ds[i] = ReadSet(argv[i], column, delim, flag_INT);
 	}
 
 	for (i = 0; i < nds; i++) 
