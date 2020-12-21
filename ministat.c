@@ -541,7 +541,7 @@ NewPartition(size_t s, size_t e, int fd, const char *d, struct dataset *ds, int 
 	p->thread = threadNum;
 	p->timeTok = 0;
 	p->timeTod = 0;
-	p->iFlag = flag_INT;
+	p->flag_INT = flag_INT;
 	p->name = n;
 	return p;
 }
