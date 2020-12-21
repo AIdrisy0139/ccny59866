@@ -47,6 +47,22 @@ dbl_cmp(const void *a, const void *b)
 	else
 		return (0);
 }
+
+/** Integer Comparator */
+static int
+int_cmp(const void *a, const void *b)
+{
+    const unsigned long long *aa = a;
+    const unsigned long long *bb = b;
+
+    if (*aa < *bb)
+		return (-1);
+	else if (*aa > *bb)
+		return (1);
+	else
+		return (0);
+}
+
 #define AN_QSORT_SUFFIX doubles
 #define AN_QSORT_TYPE double
 #define AN_QSORT_CMP dbl_cmp
@@ -58,6 +74,7 @@ struct args{
 	int column;
 	int i;
 	int flag_t;
+	int flag_INT;
 };
 struct dataset *datas[7];
 double const studentpct[] = { 80, 90, 95, 98, 99, 99.5 };
@@ -507,20 +524,6 @@ DumpPlot(void)
 	putchar('\n');
 }
 
-/** Integer Comparator */
-static int
-int_cmp(const void *a, const void *b)
-{
-    const unsigned long long *aa = a;
-    const unsigned long long *bb = b;
-
-    if (*aa < *bb)
-		return (-1);
-	else if (*aa > *bb)
-		return (1);
-	else
-		return (0);
-}
 
 struct partition
 {
@@ -733,7 +736,7 @@ ReadPartitionTimed(void * part)
 	return NULL;
 }
 void  *
-ReadPartition(void * part, int flag_INT)
+ReadPartition(void * part, int flag_INT, const char *n)
 {
 	// Unpack partition struct
 	struct partition * partition = part;//(struct partition *) partition;
@@ -912,7 +915,7 @@ ReadPartition(void * part, int flag_INT)
 
 
 static struct dataset *
-ReadSet(const char *n, int column, const char *delim, int t, int flag_INT)
+ReadSet(const char *n, int column, const char *delim, int t)
 {
 	int fileDescriptor;
 
@@ -1085,7 +1088,7 @@ void *readset_t(void *var)
 {
 	struct args *arg = (struct args *)malloc(sizeof(struct args));
 	arg = (struct args*) var;
-	datas[arg->i] = ReadSet(arg->fd,arg->column,arg->delim,arg->flag_t);
+	datas[arg->i] = ReadSet(arg->fd,arg->column,arg->delim,arg->flag_t,arg->flag_int);
     return NULL; 
 }
 static void
@@ -1221,6 +1224,7 @@ main(int argc, char **argv)
 			arguments->i = i;
 			arguments->flag_t = flag_t;
 			arguments->delim = delim;
+			arguments->flag_int = flag_INT;
 			pthread_create(&threads[i],NULL,readset_t,(void*)arguments);
 		}
 		for (i = 0; i < nds; i++){
