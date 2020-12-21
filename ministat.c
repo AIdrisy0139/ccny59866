@@ -525,25 +525,6 @@ DumpPlot(void)
 }
 
 
-struct partition *
-NewPartition(size_t s, size_t e, int fd, const char *d, struct dataset *ds, int c,
-				int threadNum, int flag_INT, const char *n)
-{
-	struct partition *p;
-	p = malloc(sizeof *p);
-	p->start = s;
-	p->end = e;
-	p->fd = fd;
-	p->delim = d;
-	p->col = c;
-	p->dataSet = ds;
-	p->thread = threadNum;
-	p->timeTok = 0;
-	p->timeTod = 0;
-	p->iFlag = flag_INT;
-	p->name = n;
-	return p;
-}
 struct partition
 {
 	int fd;
@@ -558,6 +539,27 @@ struct partition
 	int flag_INT; 
 	const char *n;
 };
+
+struct partition *
+NewPartition(size_t s, size_t e, int fd, const char *d, struct dataset * ds, int c,int threadNum, int flag_INT, const char *n)
+{
+	struct partition * p;
+
+	p = malloc(sizeof *p);
+	p->start = s;
+	p->end = e;
+
+	p->fd = fd;
+	p->delim = d;
+	p->col = c;
+	p->dataSet = ds;
+	p->thread = threadNum;
+	p->timeTok = 0;
+	p->timeTod = 0;
+	p->iFlag = flag_INT;
+	p->name = n;
+	return p;
+}
 
 /*
 	Pre-Condition: Part ptr to a valid partition struct of a file
