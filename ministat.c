@@ -47,6 +47,22 @@ dbl_cmp(const void *a, const void *b)
 	else
 		return (0);
 }
+
+/** Integer Comparator */
+static int
+int_cmp(const void *a, const void *b)
+{
+    const unsigned long long *aa = a;
+    const unsigned long long *bb = b;
+
+    if (*aa < *bb)
+		return (-1);
+	else if (*aa > *bb)
+		return (1);
+	else
+		return (0);
+}
+
 #define AN_QSORT_SUFFIX doubles
 #define AN_QSORT_TYPE double
 #define AN_QSORT_CMP dbl_cmp
@@ -58,6 +74,7 @@ struct args{
 	int column;
 	int i;
 	int flag_t;
+	int flag_INT;
 };
 struct dataset *datas[7];
 double const studentpct[] = { 80, 90, 95, 98, 99, 99.5 };
@@ -518,17 +535,19 @@ struct partition
 	int thread;
 	double timeTok;
 	double timeTod;
+	int flag_INT; 
+	const char *n;
 };
 
 struct partition *
-NewPartition(size_t s, size_t e, int fd, const char *d, struct dataset * ds, int c,int threadNum)
+NewPartition(size_t s, size_t e, int fd, const char *d, struct dataset *ds, int c,
+				int threadNum, int flag_INT, const char *n)
 {
 	struct partition * p;
-
+	
 	p = malloc(sizeof *p);
 	p->start = s;
 	p->end = e;
-
 	p->fd = fd;
 	p->delim = d;
 	p->col = c;
@@ -536,6 +555,8 @@ NewPartition(size_t s, size_t e, int fd, const char *d, struct dataset * ds, int
 	p->thread = threadNum;
 	p->timeTok = 0;
 	p->timeTod = 0;
+	p->flag_INT = flag_INT;
+	p->n = n;
 	return p;
 }
 
@@ -688,6 +709,9 @@ ReadPartitionTimed(void * part)
 				end_tod = clock();
 
 				cpu_time_used_tod += ((double)(end_tod - start_tod)) / CLOCKS_PER_SEC;
+				
+				
+				
 				if (p != NULL && *p != '\0')
 					err(2, "Invalid data on line %d in\n", line);
 				if (*finalString != '\0')
@@ -727,6 +751,8 @@ ReadPartition(void * part)
 	int column = partition->col;
 	struct dataset * localSet = partition->dataSet;
 	int threadNumber = partition->thread;
+	int flag_INT = partition->flag_INT;
+	const char *n = partition->n;
 
 
 	//printf("Thread Number = %d \n",threadNumber);
@@ -840,8 +866,35 @@ ReadPartition(void * part)
 				}
 				if (t == NULL || *t == '#')
 					continue;
+				
+				if (flag_INT) {
+                    /* convert string to unsigned long long int (64 bits on both x32 and x64 platforms) */
+                    unsigned long long result = strtoull(t, &p, 10);                   
 
-				d = strtod_fast(t, &p);
+                    /* check if the number is out of range */
+                    if (errno == ERANGE) {
+                        err(2, "Invalid data on line %d in %s\n", line, n);
+                    }
+
+                    /* check if a floating-point value appears in the INT mode. */
+                    if (p != NULL && *p == '.') {
+                        fprintf(stderr, "Error parsing file, ensure input is only integers or run without -I flag\n");
+                        exit(1);
+                    }                    
+                    
+                    /* cast int to double */
+                    d = (double) result;
+
+                    /* check if loss of precision has occurred  */
+                    if (result != (unsigned long long) d) {
+                        fprintf(stderr, "WARNING: Invalid data on line %d in %s\n: Unable to cast %llu without loss of precision\n", line, n, result);                       
+                    }
+
+                } else {
+                    /* convert string to double */
+                    d = strtod_fast(t, &p);
+                }                
+
 				if (p != NULL && *p != '\0')
 					err(2, "Invalid data on line %d in\n", line);
 				if (*finalString != '\0')
@@ -862,15 +915,19 @@ ReadPartition(void * part)
 			memcpy(overFlowBuffer,buffer,BUFFER_SIZE);
 		}
 	} // Close While Loop
+	
+	
 	return NULL;
 }
 
+
 static struct dataset *
-ReadSet(const char *n, int column, const char *delim, int t)
+ReadSet(const char *n, int column, const char *delim, int t, int flag_INT)
 {
 	int fileDescriptor;
 
 	struct dataset *s;
+
 
 	if (n == NULL) {
 		// No I/O file specified so set up opening FD
@@ -936,7 +993,7 @@ ReadSet(const char *n, int column, const char *delim, int t)
 		struct dataset * localSet = NewSet();
 		allLocalSets[i] = localSet;
 		struct partition * currentPartition =  
-			NewPartition(partitionStart, partitionEnd,fileDescriptor,delim,allLocalSets[i],column,i);
+			NewPartition(partitionStart, partitionEnd,fileDescriptor,delim,allLocalSets[i],column,i,flag_INT,n);
 
 		//printf("Start = %ld, End = %ld  \n",currentPartition->start, currentPartition->end);
 		allPartitions[i] = currentPartition;
@@ -976,7 +1033,7 @@ ReadSet(const char *n, int column, const char *delim, int t)
 			}
 		}
 	}
-	
+
 
 	// Join executed threads and accumulate metrics
 
@@ -1022,6 +1079,17 @@ ReadSet(const char *n, int column, const char *delim, int t)
 		    "Dataset %s must contain at least 3 data points\n", n);
 		exit (2);
 	}
+	
+	 /* select a comparator function based on value of flag_INT */
+    int (*comparator)(const void *, const void *);
+    if (flag_INT) {
+        comparator = int_cmp; // use integer comparator
+    } else {
+        comparator = dbl_cmp; // use double comparator
+    }	
+    /* Sort the dataset using selected comparator */
+    qsort(s->points, s->n, sizeof *s->points, comparator);
+	
 	an_qsort_doubles(s->points,s->n);
 	return (s);
 }
@@ -1029,8 +1097,8 @@ void *readset_t(void *var)
 {
 	struct args *arg = (struct args *)malloc(sizeof(struct args));
 	arg = (struct args*) var;
-	datas[arg->i] = ReadSet(arg->fd,arg->column,arg->delim,arg->flag_t);
-    	return NULL;
+	datas[arg->i] = ReadSet(arg->fd,arg->column,arg->delim,arg->flag_t,arg->flag_INT);
+    return NULL; 
 }
 static void
 usage(char const *whine)
@@ -1054,6 +1122,7 @@ usage(char const *whine)
 	fprintf(stderr, "\t-s : print avg/median/stddev bars on separate lines\n");
 	fprintf(stderr, "\t-w : width of graph/test output (default 74 or terminal width)\n");
 	fprintf(stderr, "\t-v : verbose timing data\n");
+	fprintf(stderr, "\t-I : integer mode\n");
 	exit (2);
 }
 
@@ -1069,7 +1138,8 @@ main(int argc, char **argv)
 	int flag_s = 0;
 	int flag_n = 0;
 	int flag_q = 0;
-
+	/* This flag_INT variable indicates INT mode*/
+	int flag_INT = 0;
 	int flag_t = 0;
 
 	int termwidth = 74;
@@ -1085,7 +1155,7 @@ main(int argc, char **argv)
 	}
 
 	ci = -1;
-	while ((c = getopt(argc, argv, "C:c:d:snqvw:")) != -1)
+	while ((c = getopt(argc, argv, "C:c:d:snqIvw:")) != -1)
 		switch (c) {
 		case 'C':
 			column = strtol(optarg, &p, 10);
@@ -1132,6 +1202,10 @@ main(int argc, char **argv)
 			if (termwidth < 0)
 				usage("Unable to move beyond left margin.");
 			break;
+		case 'I':		
+			printf("Operating in Integer Mode \n");	
+			flag_INT = 1;
+			break;
 		default:
 			printf(" c = %c \n", c);
 			usage("Unknown option");
@@ -1144,7 +1218,7 @@ main(int argc, char **argv)
 
 	if (argc == 0) 
 	{	
-		datas[0] = ReadSet("-", column, delim, flag_t);
+		datas[0] = ReadSet("-", column, delim, flag_t, flag_INT);
 		nds = 1;
 	} 
 	else 
@@ -1165,6 +1239,7 @@ main(int argc, char **argv)
 			arguments->i = i;
 			arguments->flag_t = flag_t;
 			arguments->delim = delim;
+			arguments->flag_INT = flag_INT;
 			pthread_create(&threads[i],NULL,readset_t,(void*)arguments);
 		}
 		for (i = 0; i < nds; i++){
