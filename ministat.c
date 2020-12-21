@@ -1200,7 +1200,8 @@ main(int argc, char **argv)
 			if (termwidth < 0)
 				usage("Unable to move beyond left margin.");
 			break;
-		case 'I':			
+		case 'I':		
+			printf("Operating in Integer Mode \n");	
 			flag_INT = 1;
 			break;
 		default:
