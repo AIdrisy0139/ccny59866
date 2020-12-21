@@ -28,8 +28,8 @@
 
 #define NSTUDENT 100
 #define NCONF 6
-#define BUFFER_SIZE BUFSIZ // Amount of characters in the buffer 
-#define THREAD_COUNT 4	// Number of threads to read each file
+#define BUFFER_SIZE 4096 // Amount of characters in the buffer 
+#define THREAD_COUNT 16	// Number of threads to read each file
 
 #define NSTUDENT 100
 #define NCONF 6

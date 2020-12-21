@@ -97,7 +97,7 @@ Partition creation algorhtim in `ReadSet()`
 This graph shows interesting behavior, 6 threads is higher than the baseline `ministat` edition. Two and four threads almost equaly performant as the baseline. Eight threads shows a clear performance gain on large file sizes.
 
 <img src="images/parallel_vs_micro_vs_stock.png">
-Here the micro optimimzed ministat is thrown into the mix. It behaves as expected with previous analysis, it gets worse than a serialized `ministat` as the file size gets bigger.
+Here the micro optimimzed ministat is thrown into the mix in pale green. It behaves as expected with previous analysis, it gets worse than a serialized `ministat` as the file size gets bigger.
 
 ### Parallel Sorting
 - Objective: Have each file be processedi n parallel. This will parallelize the serial overhead seen if Parallel File Parsing was done alone.
@@ -141,7 +141,9 @@ The new `void * readset_t` unpacks the args for the `ReadSet` function.
 ## Integer Mode
 <img src="/images/end.png">
 
-We see that with integer mode in blue we have a performance gain.
+We see that with integer mode in blue we have a performance gain over the non int mode, blue, and the baseline in orange.
+
+
 ---
 
 # Pre-Existing README
