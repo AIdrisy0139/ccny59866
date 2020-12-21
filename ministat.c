@@ -917,7 +917,7 @@ ReadPartition(void * part, int flag_INT, const char *n)
 
 
 static struct dataset *
-ReadSet(const char *n, int column, const char *delim, int t)
+ReadSet(const char *n, int column, const char *delim, int t, flag_INT)
 {
 	int fileDescriptor;
 
